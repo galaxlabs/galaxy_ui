@@ -1,263 +1,244 @@
 import frappe
+from ..core.bundle import bundle_hash
 
 
-FONT_PRESETS = {
-    "System Default": 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji"',
-    "Inter": 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial',
-    "Poppins": 'Poppins, system-ui, -apple-system, "Segoe UI", Roboto, Arial',
-    "Roboto": 'Roboto, system-ui, -apple-system, "Segoe UI", Arial',
-    "Noto Sans": '"Noto Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial',
-}
-
-SHADOWS = {
-    "None": "none",
-    "Soft": "0 6px 18px rgba(15, 23, 42, 0.08)",
-    "Medium": "0 10px 28px rgba(15, 23, 42, 0.12)",
-    "Strong": "0 16px 40px rgba(15, 23, 42, 0.18)",
-}
-
-# Optional density tokens (use later in CSS)
-DENSITY = {
-    "Compact": {"--pt-density": "compact", "--pt-pad": "8px"},
-    "Comfortable": {"--pt-density": "comfortable", "--pt-pad": "12px"},
-}
+def _pick(d: dict, keys: list[str], default=None):
+    for k in keys:
+        if k in d and d.get(k) not in (None, ""):
+            return d.get(k)
+    return default
 
 
-def _norm_mode(s: str) -> str:
-    s = (s or "").strip().lower()
-    return s if s in ("auto", "light", "dark") else "auto"
+def _as_bool(v) -> int:
+    return 1 if str(v).lower() in ("1", "true", "yes", "y", "on") else 0
 
 
-def _coalesce(*vals):
-    for v in vals:
-        if v is None:
+def _safe_var_name(name: str) -> str:
+    n = (name or "").strip()
+    if not n:
+        return ""
+    # allow raw css var name
+    if n.startswith("--"):
+        return n
+    # normalize to --ui-*
+    n = n.replace(" ", "-").replace("_", "-").lower()
+    return f"--ui-{n}"
+
+
+def _css_vars_block(selector: str, kv: dict[str, str]) -> str:
+    parts = []
+    for k, v in kv.items():
+        if not k or v in (None, ""):
             continue
-        v = str(v).strip()
-        if v:
-            return v
-    return ""
+        parts.append(f"{k}:{str(v).strip()};")
+    return f"{selector}{{{''.join(parts)}}}"
 
 
-def _add(line_list, k, v):
-    if v:
-        line_list.append(f"{k}: {v};")
+def _get_active_theme_doc() -> dict | None:
+    # Try common active flags without assuming exact field names
+    for flag_field in ("is_active", "enabled", "active"):
+        if frappe.db.has_column("UI Theme", flag_field):
+            names = frappe.get_all(
+                "UI Theme",
+                filters={flag_field: 1},
+                pluck="name",
+                limit=1,
+            )
+            if names:
+                return frappe.get_doc("UI Theme", names[0]).as_dict()
+
+    # fallback: first theme
+    names = frappe.get_all("UI Theme", pluck="name", limit=1)
+    if names:
+        return frappe.get_doc("UI Theme", names[0]).as_dict()
+
+    return None
+
+
+def _get_tokens(theme_name: str) -> list[dict]:
+    # find link field name in UI Token
+    meta = frappe.get_meta("UI Token")
+    theme_link_field = None
+    for df in meta.fields:
+        if df.fieldtype == "Link" and df.options == "UI Theme":
+            theme_link_field = df.fieldname
+            break
+
+    filters = {}
+    if theme_link_field:
+        filters[theme_link_field] = theme_name
+
+    return frappe.get_all("UI Token", filters=filters, fields=["*"], limit_page_length=2000)
 
 
 @frappe.whitelist()
-def get_active_theme():
+def get_active_theme_bundle():
     """
-    Returns:
-      {
-        mode: auto|light|dark,
-        css: "..."
-      }
+    Contract for the client runtime loader.
+    Return only data + CSS (no HTML).
     """
-    theme = frappe.get_all(
-        "Galaxy UI Theme",
-        filters={"is_active": 1},
-        fields=[
-            "name", "mode",
+    theme = _get_active_theme_doc()
 
-            # Branding
-            "primary_color", "accent_color", "success_color", "warning_color", "danger_color",
+    # Defaults if no theme exists yet
+    mode = "auto"
+    flags = {"skin": 0, "cards": 0, "rules": 0, "tailwind": 0}
+    css_tokens = ""
 
-            # Surface + Text
-            "background_color", "card_color", "panel_color", "border_color",
-            "text_primary", "text_muted",
+    if theme:
+        # mode field (try multiple possibilities)
+        mode = (_pick(theme, ["mode", "theme_mode", "color_mode"], "auto") or "auto").lower()
 
-            # Style + Typography
-            "radius_base", "shadow_level", "density",
-            "font_preset", "font_family",
+        # feature flags (try multiple possibilities)
+        flags = {
+            "skin": _as_bool(_pick(theme, ["enable_skin", "skin_enabled"], 0)),
+            "cards": _as_bool(_pick(theme, ["enable_cards", "cards_enabled", "enable_card_view"], 0)),
+            "rules": _as_bool(_pick(theme, ["enable_rules", "rules_enabled"], 0)),
+            "tailwind": _as_bool(_pick(theme, ["enable_tailwind", "tailwind_enabled"], 0)),
+        }
 
-            # Navbar
-            "navbar_bg", "navbar_text", "navbar_icon", "navbar_hover_bg", "navbar_active_bg",
+        # Build vars from tokens
+        light_vars: dict[str, str] = {}
+        dark_vars: dict[str, str] = {}
 
-            # Sidebar / Workspace
-            "sidebar_bg", "sidebar_text", "sidebar_icon", "sidebar_hover_bg", "sidebar_active_bg",
+        tokens = _get_tokens(theme["name"])
 
-            # Glow
-            "hover_glow_color", "hover_glow_strength",
-        ],
-
-        order_by="modified desc",
-        limit=1,
-    )
-
-    if not theme:
-        return {"mode": "auto", "css": ""}
-
-    t = theme[0]
-    mode = _norm_mode(t.get("mode"))
-
-    # -------------------------
-    # 1) Build LIGHT tokens from builder fields
-    # -------------------------
-    light = []
-
-    # Brand
-    _add(light, "--pt-primary", _coalesce(t.get("primary_color"), "#2563eb"))
-    _add(light, "--pt-accent", _coalesce(t.get("accent_color"), "#22c55e"))
-    _add(light, "--pt-green", _coalesce(t.get("success_color"), "#22c55e"))
-    _add(light, "--pt-amber", _coalesce(t.get("warning_color"), "#f59e0b"))
-    _add(light, "--pt-red", _coalesce(t.get("danger_color"), "#ef4444"))
-    _add(light, "--pt-blue", _coalesce(t.get("primary_color"), "#3b82f6"))
-    _add(light, "--pt-gray", "#64748b")
-
-    # Surface
-    _add(light, "--pt-bg", _coalesce(t.get("background_color"), "#f7f7fb"))
-    _add(light, "--pt-surface-1", _coalesce(t.get("card_color"), "#ffffff"))
-    _add(light, "--pt-surface-2", _coalesce(t.get("panel_color"), "#f1f5f9"))
-    _add(light, "--pt-border", _coalesce(t.get("border_color"), "rgba(15,23,42,0.12)"))
-
-    # Text
-    _add(light, "--pt-text-1", _coalesce(t.get("text_primary"), "#0f172a"))
-    _add(light, "--pt-muted", _coalesce(t.get("text_muted"), "#64748b"))
-    _add(light, "--pt-text-2", _coalesce(t.get("text_muted"), "#475569"))
-    # ---------------------------------
-    # Navbar / Sidebar / Icons / Glow
-    # ---------------------------------
-    _add(light, "--pt-navbar-bg", _coalesce(t.get("navbar_bg"), ""))  # fallback handled by CSS var()
-    _add(light, "--pt-navbar-text", _coalesce(t.get("navbar_text"), ""))
-    _add(light, "--pt-navbar-hover-bg", _coalesce(t.get("navbar_hover_bg"), ""))
-    _add(light, "--pt-navbar-active-bg", _coalesce(t.get("navbar_active_bg"), ""))
-
-    _add(light, "--pt-sidebar-bg", _coalesce(t.get("sidebar_bg"), ""))
-    _add(light, "--pt-sidebar-text", _coalesce(t.get("sidebar_text"), ""))
-    _add(light, "--pt-sidebar-hover-bg", _coalesce(t.get("sidebar_hover_bg"), ""))
-    _add(light, "--pt-sidebar-active-bg", _coalesce(t.get("sidebar_active_bg"), ""))
-
-    # Icon color: prefer explicit sidebar_icon, else navbar_icon, else muted
-    _icon = _coalesce(t.get("sidebar_icon"), t.get("navbar_icon"), "")
-    _add(light, "--pt-icon", _icon)
-
-    # Glow: prefer hover_glow_color else accent_color
-    glow_color = _coalesce(t.get("hover_glow_color"), t.get("accent_color"), "#22c55e")
-
-    strength = (t.get("hover_glow_strength") or "Med").strip()
-    alpha = {"Low": 0.18, "Med": 0.25, "High": 0.35}.get(strength, 0.25)
-
-    # If glow_color is hex (#RRGGBB) convert to rgba; otherwise accept as-is
-    def _hex_to_rgba(hx: str, a: float) -> str:
-        hx = (hx or "").strip()
-        if not hx.startswith("#") or len(hx) != 7:
-            return hx
-        r = int(hx[1:3], 16)
-        g = int(hx[3:5], 16)
-        b = int(hx[5:7], 16)
-        return f"rgba({r},{g},{b},{a})"
-
-    _add(light, "--pt-glow", _hex_to_rgba(glow_color, alpha))
-
-
-    # Radius / Shadow
-    radius = t.get("radius_base") if t.get("radius_base") is not None else 12
-    try:
-        radius = int(radius)
-    except Exception:
-        radius = 12
-    radius = max(6, min(radius, 20))
-    _add(light, "--pt-radius", f"{radius}px")
-
-    shadow_level = (t.get("shadow_level") or "Soft").strip()
-    _add(light, "--pt-shadow", SHADOWS.get(shadow_level, SHADOWS["Soft"]))
-
-    # Typography
-    preset = (t.get("font_preset") or "System Default").strip()
-    font = _coalesce(t.get("font_family"), FONT_PRESETS.get(preset, FONT_PRESETS["System Default"]))
-    _add(light, "--pt-font-family", font)
-
-    # Density (optional)
-    dens = (t.get("density") or "Comfortable").strip()
-    for k, v in DENSITY.get(dens, DENSITY["Comfortable"]).items():
-        _add(light, k, v)
-
-    # -------------------------
-    # 2) Build DARK tokens
-    #    If you later add dark fields, plug them here.
-    #    For now, use sensible defaults.
-    # -------------------------
-    dark = []
-    _add(dark, "--pt-bg", "#0b1220")
-    _add(dark, "--pt-surface-1", "#0f172a")
-    _add(dark, "--pt-surface-2", "#111c33")
-    _add(dark, "--pt-text-1", "#e5e7eb")
-    _add(dark, "--pt-text-2", "#cbd5e1")
-    _add(dark, "--pt-muted", "#94a3b8")
-    _add(dark, "--pt-border", "rgba(148,163,184,0.18)")
-    _add(dark, "--pt-shadow", "0 10px 28px rgba(0,0,0,0.45)")
-
-    # keep same font/radius/colors in dark unless overridden
-    _add(dark, "--pt-font-family", font)
-    _add(dark, "--pt-radius", f"{radius}px")
-    _add(dark, "--pt-primary", _coalesce(t.get("primary_color"), "#3b82f6"))
-    _add(dark, "--pt-accent", _coalesce(t.get("accent_color"), "#22c55e"))
-    _add(dark, "--pt-green", _coalesce(t.get("success_color"), "#22c55e"))
-    _add(dark, "--pt-amber", _coalesce(t.get("warning_color"), "#f59e0b"))
-    _add(dark, "--pt-red", _coalesce(t.get("danger_color"), "#ef4444"))
-    _add(dark, "--pt-blue", _coalesce(t.get("primary_color"), "#3b82f6"))
-    _add(dark, "--pt-gray", "#94a3b8")
-
-    _add(dark, "--pt-navbar-bg", _coalesce(t.get("navbar_bg"), ""))
-    _add(dark, "--pt-navbar-text", _coalesce(t.get("navbar_text"), ""))
-    _add(dark, "--pt-navbar-hover-bg", _coalesce(t.get("navbar_hover_bg"), ""))
-    _add(dark, "--pt-navbar-active-bg", _coalesce(t.get("navbar_active_bg"), ""))
-
-    _add(dark, "--pt-sidebar-bg", _coalesce(t.get("sidebar_bg"), ""))
-    _add(dark, "--pt-sidebar-text", _coalesce(t.get("sidebar_text"), ""))
-    _add(dark, "--pt-sidebar-hover-bg", _coalesce(t.get("sidebar_hover_bg"), ""))
-    _add(dark, "--pt-sidebar-active-bg", _coalesce(t.get("sidebar_active_bg"), ""))
-
-    _add(dark, "--pt-icon", _icon)
-    _add(dark, "--pt-glow", _hex_to_rgba(glow_color, alpha))
-
-
-    for k, v in DENSITY.get(dens, DENSITY["Comfortable"]).items():
-        _add(dark, k, v)
-
-    # -------------------------
-    # 3) Advanced override tokens table (optional)
-    #    These override both light & dark if user added them.
-    # -------------------------
-    try:
-        tokens = frappe.get_all(
-            "Galaxy UI Token",
-            filters={"parent": t["name"], "enabled": 1},
-            fields=["token", "light_value", "dark_value"],
-            order_by="idx asc",
-        )
-    except Exception:
-        tokens = []
-
-    if tokens:
-        # use dict so overrides are clean
-        light_map = {}
-        dark_map = {}
-
-        # load existing
-        for line in light:
-            k, v = line.split(":", 1)
-            light_map[k.strip()] = v.strip().rstrip(";")
-        for line in dark:
-            k, v = line.split(":", 1)
-            dark_map[k.strip()] = v.strip().rstrip(";")
-
-        for row in tokens:
-            token = (row.get("token") or "").strip()
-            if not token.startswith("--"):
+        # Guess token fields
+        for t in tokens:
+            raw_name = _pick(t, ["css_variable", "variable", "token", "name", "key"])
+            if not raw_name:
                 continue
-            lv = (row.get("light_value") or "").strip()
-            dv = (row.get("dark_value") or "").strip()
-            if lv:
-                light_map[token] = lv
-            if dv:
-                dark_map[token] = dv
 
-        light = [f"{k}: {v};" for k, v in light_map.items()]
-        dark = [f"{k}: {v};" for k, v in dark_map.items()]
+            var_name = _safe_var_name(raw_name)
 
-    css = (
-        ":root{\n" + "\n".join(light) + "\n}\n"
-        'html[data-pt-mode="dark"]{\n' + "\n".join(dark) + "\n}\n"
+            light_val = _pick(t, ["light_value", "light", "value_light", "value"])
+            dark_val = _pick(t, ["dark_value", "dark", "value_dark", "value"])
+
+            if light_val is not None and light_val != "":
+                light_vars[var_name] = str(light_val).strip()
+            if dark_val is not None and dark_val != "":
+                dark_vars[var_name] = str(dark_val).strip()
+
+        # If you want a guaranteed --ui-primary, map from common theme fields if missing
+        if "--ui-primary" not in light_vars:
+            primary = _pick(theme, ["primary", "primary_color", "brand_color"], "")
+            if primary:
+                light_vars["--ui-primary"] = str(primary).strip()
+        if "--ui-primary" not in dark_vars:
+            primary_dark = _pick(theme, ["primary_dark", "brand_color_dark"], "") or light_vars.get("--ui-primary", "")
+            if primary_dark:
+                dark_vars["--ui-primary"] = str(primary_dark).strip()
+
+        css_tokens = _css_vars_block(":root", light_vars) + "\n" + _css_vars_block('html[data-ui-mode="dark"]', dark_vars)
+
+    h = bundle_hash(mode, str(flags), css_tokens)
+
+    return {
+        "mode": mode,
+        "flags": flags,
+        "css_tokens": css_tokens,
+        "hash": h,
+    }
+    """
+    Return UI Presets for selector page.
+    Only lightweight fields for card grid.
+    """
+    if not frappe.db.exists("DocType", "UI Preset"):
+        return []
+
+    fields = ["name"]
+
+    meta = frappe.get_meta("UI Preset")
+    fieldnames = {df.fieldname for df in meta.fields}
+
+    # optional common fields (we include only if they exist)
+    for f in ("title", "preset_title", "image", "preview_image", "thumbnail", "ui_theme"):
+        if f in fieldnames:
+            fields.append(f)
+
+    return frappe.get_all(
+        "UI Preset",
+        fields=fields,
+        order_by="modified desc",
+        limit_page_length=100,
     )
 
-    return {"mode": mode, "css": css, "theme": t["name"]}
+@frappe.whitelist()
+def list_presets():
+    """
+    Return UI Presets for selector page (card grid).
+    Uses the actual fieldnames of our UI Preset DocType.
+    """
+    if not frappe.db.exists("DocType", "UI Preset"):
+        return []
+
+    meta = frappe.get_meta("UI Preset")
+    fieldnames = {df.fieldname for df in meta.fields}
+
+    # always try these (if they exist)
+    wanted = [
+        "name",
+        "preset_name",
+        "preview_image",
+        "short_description",
+        "applies_to",
+        "is_featured",
+        "sort_order",
+        "theme_ref",
+    ]
+
+    fields = ["name"] + [f for f in wanted if f != "name" and f in fieldnames]
+
+    return frappe.get_all(
+        "UI Preset",
+        fields=fields,
+        order_by="is_featured desc, sort_order asc, modified desc",
+        limit_page_length=200,
+    )
+
+
+@frappe.whitelist()
+def apply_preset(preset_name: str):
+    """
+    Activate preset's linked UI Theme.
+    Only one theme will be active at a time.
+    """
+    if not preset_name:
+        frappe.throw("Preset name is required")
+
+    if not frappe.db.exists("UI Preset", preset_name):
+        frappe.throw("Preset not found")
+
+    preset = frappe.get_doc("UI Preset", preset_name)
+
+    # detect linked theme field dynamically
+    meta = frappe.get_meta("UI Preset")
+    theme_link_field = None
+    for df in meta.fields:
+        if df.fieldtype == "Link" and df.options == "UI Theme":
+            theme_link_field = df.fieldname
+            break
+
+    if not theme_link_field:
+        frappe.throw("UI Preset is not linked to UI Theme")
+
+    theme_name = preset.get(theme_link_field)
+
+    if not theme_name:
+        frappe.throw("This preset is not linked to any UI Theme")
+
+    # deactivate all themes
+    for flag_field in ("is_active", "enabled", "active"):
+        if frappe.db.has_column("UI Theme", flag_field):
+            frappe.db.sql(f"update `tabUI Theme` set `{flag_field}` = 0")
+
+    # activate selected theme
+    for flag_field in ("is_active", "enabled", "active"):
+        if frappe.db.has_column("UI Theme", flag_field):
+            frappe.db.set_value("UI Theme", theme_name, flag_field, 1)
+
+    frappe.db.commit()
+
+    return {
+        "ok": 1,
+        "theme": theme_name,
+    }

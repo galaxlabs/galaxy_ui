@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestGalaxyUITheme(FrappeTestCase):
+class TestPortalSection(FrappeTestCase):
 	pass

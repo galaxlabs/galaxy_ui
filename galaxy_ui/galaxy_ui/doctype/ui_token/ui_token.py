@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class GalaxyUIToken(Document):
+class UIToken(Document):
 	pass

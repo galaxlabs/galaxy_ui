@@ -1,0 +1,17 @@
+Add these to hooks.py (desk + web), step-by-step later:
+
+app_include_css = [
+  "/assets/galaxy_ui/ui/styles/base.css",
+]
+
+app_include_js = [
+  "/assets/galaxy_ui/ui/runtime/loader.js",
+]
+
+website_include_css = [
+  "/assets/galaxy_ui/ui/styles/base.css",
+]
+
+website_include_js = [
+  "/assets/galaxy_ui/ui/runtime/loader.js",
+]

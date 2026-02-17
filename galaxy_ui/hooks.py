@@ -26,20 +26,25 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 app_include_css = [
-    "/assets/galaxy_ui/css/galaxy_ui.css",
+    "/assets/galaxy_ui/ui/styles/base.css",
+    "/assets/galaxy_ui/ui/styles/components.css",
+    "/assets/galaxy_ui/ui/styles/skin.css",
 ]
 
 app_include_js = [
-    "/assets/galaxy_ui/js/galaxy_ui.js",
+    "/assets/galaxy_ui/ui/runtime/loader.js?v=20260217-1",
 ]
 
+
+
 # include js, css files in header of web template
-web_include_css = [
-    "/assets/galaxy_ui/css/galaxy_ui.css",
+website_include_css = [
+    "/assets/galaxy_ui/ui/styles/base.css",
+    "/assets/galaxy_ui/ui/styles/components.css",
+    "/assets/galaxy_ui/ui/styles/skin.css",
     ]
-web_include_js = [
-    "/assets/galaxy_ui/js/galaxy_ui.js", 
-    
+website_include_js = [
+        "/assets/galaxy_ui/ui/runtime/loader.js?v=20260217-1",    
     ]
 
 # include custom scss in every website theme (without file extension ".scss")

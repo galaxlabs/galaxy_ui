@@ -1,0 +1,94 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-17 14:35:31.224149",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "setup_section",
+  "enabled",
+  "req_doctype",
+  "column_break_poyh",
+  "applies_to",
+  "priority",
+  "section_break_zynq",
+  "condition_json",
+  "result_json"
+ ],
+ "fields": [
+  {
+   "fieldname": "req_doctype",
+   "fieldtype": "Link",
+   "label": "Doctype",
+   "options": "DocType",
+   "search_index": 1
+  },
+  {
+   "fieldname": "applies_to",
+   "fieldtype": "Dynamic Link",
+   "label": "Applies To Doctype",
+   "options": "req_doctype"
+  },
+  {
+   "fieldname": "column_break_poyh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_zynq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "condition_json",
+   "fieldtype": "Code",
+   "label": "Condition Json"
+  },
+  {
+   "fieldname": "result_json",
+   "fieldtype": "Code",
+   "label": "Result Json"
+  },
+  {
+   "fieldname": "setup_section",
+   "fieldtype": "Section Break",
+   "label": "Setup"
+  },
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Priority"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-17 14:44:47.447004",
+ "modified_by": "Administrator",
+ "module": "Galaxy UI",
+ "name": "UI Rule",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

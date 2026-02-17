@@ -1,0 +1,97 @@
+/* Galaxy UI - OPTIONAL skin layer
+   Enabled only when html[data-ui-skin="1"] is present (set by loader when theme.flags.skin=1)
+   Keep selectors minimal + upgrade-safe. */
+
+html[data-ui-skin="1"] {
+  --ui-primary: var(--ui-primary, #1e752c);
+  --ui-bg: var(--ui-bg, #0b0f14);
+  --ui-card: var(--ui-card, #111827);
+  --ui-border: var(--ui-border, rgba(255,255,255,0.10));
+  --ui-text: var(--ui-text, rgba(255,255,255,0.92));
+  --ui-text-muted: var(--ui-text-muted, rgba(255,255,255,0.65));
+}
+
+/* Navbar */
+html[data-ui-skin="1"] header.navbar,
+html[data-ui-skin="1"] .navbar {
+  background: var(--ui-primary) !important;
+}
+html[data-ui-skin="1"] header.navbar .nav-link,
+html[data-ui-skin="1"] header.navbar .navbar-nav .nav-link,
+html[data-ui-skin="1"] header.navbar .navbar-brand,
+html[data-ui-skin="1"] header.navbar .navbar-text,
+html[data-ui-skin="1"] header.navbar .btn,
+html[data-ui-skin="1"] header.navbar svg,
+html[data-ui-skin="1"] header.navbar i {
+  color: #fff !important;
+  fill: #fff !important;
+}
+
+/* Page background + general text (soft) */
+html[data-ui-skin="1"] body,
+html[data-ui-skin="1"] .main-section {
+  background: var(--ui-bg) !important;
+}
+html[data-ui-skin="1"] body {
+  color: var(--ui-text);
+}
+
+/* Cards / widgets */
+html[data-ui-skin="1"] .desk-page .widget,
+html[data-ui-skin="1"] .frappe-card,
+html[data-ui-skin="1"] .card,
+html[data-ui-skin="1"] .form-dashboard .dashboard-section {
+  background: var(--ui-card) !important;
+  border: 1px solid var(--ui-border) !important;
+}
+
+/* Primary buttons */
+html[data-ui-skin="1"] .btn-primary,
+html[data-ui-skin="1"] .btn.btn-primary {
+  background: var(--ui-primary) !important;
+  border-color: var(--ui-primary) !important;
+}
+html[data-ui-skin="1"] .btn-primary:hover,
+html[data-ui-skin="1"] .btn.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+/* Links */
+html[data-ui-skin="1"] a {
+  color: var(--ui-primary);
+  /* Bridge Galaxy tokens -> Frappe theme vars */
+  --primary: var(--ui-primary);
+  --bg-color: var(--ui-bg);
+  --card-bg: var(--ui-card);
+  --border-color: var(--ui-border);
+  --text-color: var(--ui-text);
+  --text-muted: var(--ui-text-muted);
+}
+/* === High Visibility Desk Mapping (Phase 2 Proof) === */
+
+/* Main Desk container */
+html[data-ui-skin="1"] .layout-main-section,
+html[data-ui-skin="1"] .page-content,
+html[data-ui-skin="1"] .container.page-body {
+  background: var(--ui-bg) !important;
+}
+
+/* List & Form containers */
+html[data-ui-skin="1"] .list-view-container,
+html[data-ui-skin="1"] .form-page,
+html[data-ui-skin="1"] .form-layout {
+  background: var(--ui-card) !important;
+  border: 1px solid var(--ui-border) !important;
+}
+
+/* Sidebar (Desk left menu) */
+html[data-ui-skin="1"] .desk-sidebar,
+html[data-ui-skin="1"] .layout-side-section {
+  background: var(--ui-sidebar-bg, var(--ui-card)) !important;
+}
+
+/* Workspace cards */
+html[data-ui-skin="1"] .widget,
+html[data-ui-skin="1"] .widget-body {
+  background: var(--ui-card) !important;
+}

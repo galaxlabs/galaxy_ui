@@ -1,0 +1,113 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-17 16:47:26.821485",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "card_type",
+  "route",
+  "required_role",
+  "column_break_ipsi",
+  "subtitle",
+  "refrence_doctype",
+  "create_mode",
+  "badge_kpi",
+  "section_break_lxef",
+  "kpi_query",
+  "section_break_vvix",
+  "filters_json"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title"
+  },
+  {
+   "fieldname": "subtitle",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Subtitle"
+  },
+  {
+   "fieldname": "card_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Card Type",
+   "options": "List (shows list of a DocType)\nCreate (create record)\nReport/Dashboard\nLink (external/internal URL)"
+  },
+  {
+   "fieldname": "refrence_doctype",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Refrence DocType",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Route"
+  },
+  {
+   "fieldname": "create_mode",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Create Mode",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "section_break_vvix",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "filters_json",
+   "fieldtype": "Code",
+   "label": "Filters Json"
+  },
+  {
+   "fieldname": "required_role",
+   "fieldtype": "Link",
+   "label": "Required Role",
+   "options": "Role"
+  },
+  {
+   "fieldname": "column_break_ipsi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "badge_kpi",
+   "fieldtype": "Select",
+   "label": "Badge Kpi",
+   "options": "Count\nSum\nCustom"
+  },
+  {
+   "fieldname": "section_break_lxef",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "kpi_query",
+   "fieldtype": "Code",
+   "label": "Kpi Query"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-02-17 17:24:34.829722",
+ "modified_by": "Administrator",
+ "module": "Galaxy UI",
+ "name": "Portal Card",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

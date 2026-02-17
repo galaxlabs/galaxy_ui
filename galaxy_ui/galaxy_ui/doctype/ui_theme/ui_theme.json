@@ -8,6 +8,20 @@
  "field_order": [
   "status_section",
   "is_active",
+  "column_break_eoys",
+  "enable_skin",
+  "enable_cards",
+  "column_break_nyaj",
+  "enable_rules",
+  "enable_tailwind",
+  "section_break_jwrb",
+  "status",
+  "applies_to",
+  "published_by",
+  "column_break_ktxz",
+  "source_preset",
+  "version",
+  "published_on",
   "section_break_iomw",
   "theme_name",
   "column_break_spyt",
@@ -22,9 +36,11 @@
   "surface_section",
   "background_color",
   "border_color",
+  "primary_color_dark",
   "column_break_wzoh",
   "card_color",
   "panel_color",
+  "background_color_dark",
   "text_section",
   "text_primary",
   "column_break_vyqy",
@@ -223,7 +239,7 @@
    "fieldname": "tokens",
    "fieldtype": "Table",
    "label": "Tokens",
-   "options": "Galaxy UI Token"
+   "options": "UI Token"
   },
   {
    "fieldname": "section_break_iomw",
@@ -325,15 +341,99 @@
    "fieldname": "navbar_active_bg",
    "fieldtype": "Color",
    "label": "Navbar Active Background"
+  },
+  {
+   "fieldname": "column_break_eoys",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_skin",
+   "fieldtype": "Check",
+   "label": "Enable Skin"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_cards",
+   "fieldtype": "Check",
+   "label": "Enable Cards"
+  },
+  {
+   "fieldname": "column_break_nyaj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_rules",
+   "fieldtype": "Check",
+   "label": "Enable Rules"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_tailwind",
+   "fieldtype": "Check",
+   "label": "Enable Tailwind"
+  },
+  {
+   "fieldname": "primary_color_dark",
+   "fieldtype": "Color",
+   "label": "Primary Color Dark"
+  },
+  {
+   "fieldname": "background_color_dark",
+   "fieldtype": "Color",
+   "label": "Background Color Dark"
+  },
+  {
+   "fieldname": "section_break_jwrb",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nPublished"
+  },
+  {
+   "fieldname": "column_break_ktxz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "source_preset",
+   "fieldtype": "Link",
+   "label": "Source Preset",
+   "options": "UI Preset"
+  },
+  {
+   "fieldname": "applies_to",
+   "fieldtype": "Select",
+   "label": "Applies To",
+   "options": "Desk\nPortal\nBoth"
+  },
+  {
+   "fieldname": "published_by",
+   "fieldtype": "Link",
+   "label": "Published By",
+   "options": "User"
+  },
+  {
+   "fieldname": "version",
+   "fieldtype": "Data",
+   "label": "Version"
+  },
+  {
+   "fieldname": "published_on",
+   "fieldtype": "Datetime",
+   "label": "Published On"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-17 01:44:12.803410",
+ "modified": "2026-02-17 18:56:32.374994",
  "modified_by": "Administrator",
  "module": "Galaxy UI",
- "name": "Galaxy UI Theme",
+ "name": "UI Theme",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [

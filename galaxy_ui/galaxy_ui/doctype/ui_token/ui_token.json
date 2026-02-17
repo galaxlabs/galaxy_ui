@@ -11,7 +11,8 @@
   "type",
   "col_values",
   "light_value",
-  "dark_value"
+  "dark_value",
+  "source"
  ],
  "fields": [
   {
@@ -51,16 +52,23 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Dark Value"
+  },
+  {
+   "default": "System",
+   "fieldname": "source",
+   "fieldtype": "Select",
+   "label": "Source",
+   "options": "System\nCustom"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-02-16 21:10:44.599381",
+ "modified": "2026-02-17 22:09:43.656401",
  "modified_by": "Administrator",
  "module": "Galaxy UI",
- "name": "Galaxy UI Token",
+ "name": "UI Token",
  "owner": "Administrator",
  "permissions": [],
  "row_format": "Dynamic",

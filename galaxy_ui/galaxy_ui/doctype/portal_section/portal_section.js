@@ -1,7 +1,7 @@
 // Copyright (c) 2026, Galaxy Labs and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("Galaxy UI Theme", {
+// frappe.ui.form.on("Portal Section", {
 // 	refresh(frm) {
 
 // 	},

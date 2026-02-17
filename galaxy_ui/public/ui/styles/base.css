@@ -1,0 +1,7 @@
+/* Safe base helpers only. No navbar/sidebar/background overrides here. */
+:root{
+  --ui-radius: 8px;
+}
+.ui-card{
+  border-radius: var(--ui-radius);
+}
