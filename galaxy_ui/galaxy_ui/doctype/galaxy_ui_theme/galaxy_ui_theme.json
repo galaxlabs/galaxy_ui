@@ -1,0 +1,360 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:theme_name",
+ "creation": "2026-02-16 18:47:15.743822",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "status_section",
+  "is_active",
+  "section_break_iomw",
+  "theme_name",
+  "column_break_spyt",
+  "mode",
+  "branding_section",
+  "primary_color",
+  "success_color",
+  "danger_color",
+  "column_break_mevn",
+  "accent_color",
+  "warning_color",
+  "surface_section",
+  "background_color",
+  "border_color",
+  "column_break_wzoh",
+  "card_color",
+  "panel_color",
+  "text_section",
+  "text_primary",
+  "column_break_vyqy",
+  "text_muted",
+  "style_section",
+  "shadow_level",
+  "density",
+  "column_break_wqdt",
+  "radius_base",
+  "font_section",
+  "font_preset",
+  "column_break_mkco",
+  "font_family",
+  "sidebar__workspace_section",
+  "sidebar_bg",
+  "column_break_vhlg",
+  "sidebar_text",
+  "navbar_section",
+  "navbar_bg",
+  "navbar_icon",
+  "column_break_luah",
+  "navbar_text",
+  "navbar_hover_bg",
+  "navbar_active_bg",
+  "glow_section",
+  "hover_glow_color",
+  "sidebar_icon",
+  "column_break_kfob",
+  "hover_glow_strength",
+  "sidebar_active_bg",
+  "sidebar_hover_bg",
+  "sec_tokens",
+  "tokens"
+ ],
+ "fields": [
+  {
+   "fieldname": "theme_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Theme Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "description": "Only one theme should be active per site.",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Active"
+  },
+  {
+   "default": "Auto",
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Mode",
+   "options": "Auto\nLight\nDark"
+  },
+  {
+   "fieldname": "branding_section",
+   "fieldtype": "Section Break",
+   "label": "Branding"
+  },
+  {
+   "fieldname": "primary_color",
+   "fieldtype": "Color",
+   "label": "Primary Color"
+  },
+  {
+   "fieldname": "success_color",
+   "fieldtype": "Color",
+   "label": "Success"
+  },
+  {
+   "fieldname": "danger_color",
+   "fieldtype": "Color",
+   "label": "Danger"
+  },
+  {
+   "fieldname": "column_break_mevn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "accent_color",
+   "fieldtype": "Color",
+   "label": "Accent Color"
+  },
+  {
+   "fieldname": "warning_color",
+   "fieldtype": "Color",
+   "label": "Warning"
+  },
+  {
+   "fieldname": "surface_section",
+   "fieldtype": "Section Break",
+   "label": "Surface"
+  },
+  {
+   "fieldname": "background_color",
+   "fieldtype": "Color",
+   "label": "Background"
+  },
+  {
+   "fieldname": "border_color",
+   "fieldtype": "Color",
+   "label": "Border Color"
+  },
+  {
+   "fieldname": "column_break_wzoh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "card_color",
+   "fieldtype": "Color",
+   "label": "Card Background"
+  },
+  {
+   "fieldname": "panel_color",
+   "fieldtype": "Color",
+   "label": "Panel Background"
+  },
+  {
+   "fieldname": "text_section",
+   "fieldtype": "Section Break",
+   "label": "Text"
+  },
+  {
+   "fieldname": "text_primary",
+   "fieldtype": "Color",
+   "label": "Text Primary"
+  },
+  {
+   "fieldname": "column_break_vyqy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "text_muted",
+   "fieldtype": "Color",
+   "label": "Text Muted"
+  },
+  {
+   "fieldname": "style_section",
+   "fieldtype": "Section Break",
+   "label": "Style"
+  },
+  {
+   "fieldname": "shadow_level",
+   "fieldtype": "Select",
+   "label": "Shadow Level",
+   "options": "None\nSoft\nMedium\nStrong"
+  },
+  {
+   "fieldname": "density",
+   "fieldtype": "Select",
+   "label": "Density",
+   "options": "Compact\nComfortable"
+  },
+  {
+   "fieldname": "column_break_wqdt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Radius (Int slider) (6\u201320)",
+   "fieldname": "radius_base",
+   "fieldtype": "Int",
+   "label": "Radius"
+  },
+  {
+   "fieldname": "font_section",
+   "fieldtype": "Section Break",
+   "label": "Typography"
+  },
+  {
+   "fieldname": "font_preset",
+   "fieldtype": "Select",
+   "label": "Font Preset",
+   "options": "System Default\nInter\nPoppins\nRoboto\nNoto Sans"
+  },
+  {
+   "description": "Example: system-ui, -apple-system, Segoe UI, Roboto, Arial",
+   "fieldname": "font_family",
+   "fieldtype": "Data",
+   "label": "Font Family"
+  },
+  {
+   "fieldname": "column_break_mkco",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sec_tokens",
+   "fieldtype": "Section Break",
+   "label": "Tokens (CSS Variables)"
+  },
+  {
+   "fieldname": "tokens",
+   "fieldtype": "Table",
+   "label": "Tokens",
+   "options": "Galaxy UI Token"
+  },
+  {
+   "fieldname": "section_break_iomw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_spyt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status_section",
+   "fieldtype": "Section Break",
+   "label": "Status"
+  },
+  {
+   "fieldname": "glow_section",
+   "fieldtype": "Section Break",
+   "label": "Glow"
+  },
+  {
+   "fieldname": "hover_glow_color",
+   "fieldtype": "Color",
+   "label": "Hover Glow Color"
+  },
+  {
+   "fieldname": "column_break_kfob",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "hover_glow_strength",
+   "fieldtype": "Select",
+   "label": "Hover Glow Strength",
+   "options": "Low\nMed\nHigh"
+  },
+  {
+   "fieldname": "sidebar__workspace_section",
+   "fieldtype": "Section Break",
+   "label": "Sidebar / Workspace"
+  },
+  {
+   "fieldname": "sidebar_bg",
+   "fieldtype": "Color",
+   "label": "Sidebar Background"
+  },
+  {
+   "fieldname": "column_break_vhlg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sidebar_text",
+   "fieldtype": "Color",
+   "label": "Sidebar Text"
+  },
+  {
+   "fieldname": "sidebar_icon",
+   "fieldtype": "Color",
+   "label": "Sidebar Icon Color"
+  },
+  {
+   "fieldname": "sidebar_active_bg",
+   "fieldtype": "Color",
+   "label": "Sidebar Active Background"
+  },
+  {
+   "fieldname": "sidebar_hover_bg",
+   "fieldtype": "Color",
+   "label": "Sidebar Hover Background"
+  },
+  {
+   "fieldname": "navbar_section",
+   "fieldtype": "Section Break",
+   "label": "Navbar"
+  },
+  {
+   "fieldname": "navbar_bg",
+   "fieldtype": "Color",
+   "label": "Navbar Background"
+  },
+  {
+   "fieldname": "column_break_luah",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "navbar_text",
+   "fieldtype": "Color",
+   "label": "Navbar Text"
+  },
+  {
+   "fieldname": "navbar_icon",
+   "fieldtype": "Color",
+   "label": "Navbar Icon Color"
+  },
+  {
+   "fieldname": "navbar_hover_bg",
+   "fieldtype": "Color",
+   "label": "Navbar Hover Background"
+  },
+  {
+   "fieldname": "navbar_active_bg",
+   "fieldtype": "Color",
+   "label": "Navbar Active Background"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-17 01:44:12.803410",
+ "modified_by": "Administrator",
+ "module": "Galaxy UI",
+ "name": "Galaxy UI Theme",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "theme_name"
+}

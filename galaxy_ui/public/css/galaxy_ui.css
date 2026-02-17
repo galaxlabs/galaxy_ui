@@ -1,0 +1,47 @@
+/* Navbar / Top bar (v15) */
+.navbar, .navbar-default, header.navbar {
+  background: var(--pt-navbar-bg, var(--pt-surface-2)) !important;
+  border-color: var(--pt-border) !important;
+}
+.navbar a, .navbar .navbar-nav > li > a {
+  color: var(--pt-navbar-text, var(--pt-text-1)) !important;
+}
+.navbar a:hover, .navbar .navbar-nav > li > a:hover {
+  background: var(--pt-navbar-hover-bg, rgba(34,197,94,0.10)) !important;
+}
+
+/* Sidebar */
+.layout-side-section, .standard-sidebar {
+  background: var(--pt-sidebar-bg, var(--pt-surface-2)) !important;
+}
+.standard-sidebar .sidebar-item,
+.standard-sidebar .sidebar-item a {
+  color: var(--pt-sidebar-text, var(--pt-text-1)) !important;
+}
+.standard-sidebar .sidebar-item:hover,
+.standard-sidebar .sidebar-item a:hover {
+  background: var(--pt-sidebar-hover-bg, rgba(34,197,94,0.10)) !important;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0) !important;
+}
+
+/* Icon colors */
+.standard-sidebar svg,
+.standard-sidebar .icon,
+.navbar .icon,
+.navbar svg {
+  color: var(--pt-icon, var(--pt-muted)) !important;
+  fill: currentColor !important;
+}
+
+/* Active item */
+.standard-sidebar .sidebar-item.active,
+.standard-sidebar .sidebar-item.active a {
+  background: var(--pt-sidebar-active-bg, rgba(34,197,94,0.18)) !important;
+}
+
+/* Green glow on hover (optional) */
+.standard-sidebar .sidebar-item:hover,
+.list-row:hover,
+.pt-card:hover {
+  box-shadow: 0 0 0 2px var(--pt-glow, rgba(34,197,94,0.25)), var(--pt-shadow) !important;
+}
