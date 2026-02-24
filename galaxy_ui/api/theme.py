@@ -1,5 +1,5 @@
 import frappe
-from ..core.bundle import bundle_hash
+from ..core.bundle import bundle_hash, validate_ui_layout_preset
 
 
 def _pick(d: dict, keys: list[str], default=None):
@@ -70,7 +70,6 @@ def _get_tokens(theme_name: str) -> list[dict]:
 
     return frappe.get_all("UI Token", filters=filters, fields=["*"], limit_page_length=2000)
 
-
 @frappe.whitelist()
 def get_active_theme_bundle():
     """
@@ -83,6 +82,7 @@ def get_active_theme_bundle():
     mode = "auto"
     flags = {"skin": 0, "cards": 0, "rules": 0, "tailwind": 0}
     css_tokens = ""
+    layout = None
 
     if theme:
         # mode field (try multiple possibilities)
@@ -130,38 +130,25 @@ def get_active_theme_bundle():
 
         css_tokens = _css_vars_block(":root", light_vars) + "\n" + _css_vars_block('html[data-ui-mode="dark"]', dark_vars)
 
-    h = bundle_hash(mode, str(flags), css_tokens)
+    if theme and theme.get("layout_json"):
+        import json
+        try:
+            layout = json.loads(theme.get("layout_json"))
+            validate_ui_layout_preset(layout)
+        except Exception:
+            # Don't crash loader; just ignore invalid layout_json
+            layout = None
+
+    h = bundle_hash(mode, str(flags), css_tokens, str(layout))
 
     return {
         "mode": mode,
         "flags": flags,
         "css_tokens": css_tokens,
         "hash": h,
+        "layout": layout,
     }
-    """
-    Return UI Presets for selector page.
-    Only lightweight fields for card grid.
-    """
-    if not frappe.db.exists("DocType", "UI Preset"):
-        return []
-
-    fields = ["name"]
-
-    meta = frappe.get_meta("UI Preset")
-    fieldnames = {df.fieldname for df in meta.fields}
-
-    # optional common fields (we include only if they exist)
-    for f in ("title", "preset_title", "image", "preview_image", "thumbnail", "ui_theme"):
-        if f in fieldnames:
-            fields.append(f)
-
-    return frappe.get_all(
-        "UI Preset",
-        fields=fields,
-        order_by="modified desc",
-        limit_page_length=100,
-    )
-
+    
 @frappe.whitelist()
 def list_presets():
     """

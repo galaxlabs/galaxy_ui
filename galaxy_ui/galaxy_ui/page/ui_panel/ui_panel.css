@@ -1,0 +1,69 @@
+/* Galaxy UI Panel - scoped styles */
+.guip-shell {
+  border: 1px solid var(--ui-border, #e5e7eb);
+  border-radius: 12px;
+  background: var(--ui-bg, #fff);
+  overflow: hidden;
+}
+
+.guip-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--ui-navbar-bg, #f8fafc);
+  border-bottom: 1px solid var(--ui-border, #e5e7eb);
+}
+
+.guip-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guip-switch .btn {
+  margin-right: 6px;
+}
+
+.guip-body {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: 520px;
+}
+
+.guip-sidebar {
+  padding: 12px;
+  background: var(--ui-sidebar-bg, #f8fafc);
+  border-right: 1px solid var(--ui-border, #e5e7eb);
+}
+
+.guip-content {
+  padding: 12px;
+}
+
+.guip-box,
+.guip-card {
+  border: 1px solid var(--ui-border, #e5e7eb);
+  border-radius: 12px;
+  background: var(--ui-card, #fff);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.guip-layout-name {
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 6px;
+  color: var(--ui-text, #111827);
+}
+
+.guip-layout-meta {
+  margin-top: 6px;
+}
+
+.guip-debug {
+  background: rgba(0,0,0,0.03);
+  border-radius: 10px;
+  padding: 10px;
+}

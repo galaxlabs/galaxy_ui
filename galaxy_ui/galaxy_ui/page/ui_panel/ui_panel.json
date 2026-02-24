@@ -1,0 +1,19 @@
+{
+ "content": null,
+ "creation": "2026-02-24 00:10:05.104176",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2026-02-24 00:10:05.104176",
+ "modified_by": "Administrator",
+ "module": "Galaxy UI",
+ "name": "ui_panel",
+ "owner": "Administrator",
+ "page_name": "ui_panel",
+ "roles": [],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "UI Panel"
+}
