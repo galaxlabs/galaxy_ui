@@ -91,3 +91,84 @@ UI_LAYOUT_PRESET_SCHEMA = {
         },
     },
 }
+
+
+UI_PANEL_NAVIGATION_SCHEMA_V1 = {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://galaxylabs.online/schemas/ui-panel-navigation-v1.schema.json",
+    "title": "UI Panel Navigation v1",
+    "type": "object",
+    "additionalProperties": False,
+    "required": ["sections", "topbar"],
+    "properties": {
+        "sections": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["label", "items"],
+                "properties": {
+                    "label": {"type": "string", "minLength": 1, "maxLength": 120},
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["type", "ref", "label"],
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "doctype",
+                                        "report",
+                                        "page",
+                                        "workspace",
+                                        "url",
+                                        "separator",
+                                        "heading",
+                                        "route",
+                                    ],
+                                },
+                                "ref": {"type": "string", "minLength": 1, "maxLength": 140},
+                                "label": {"type": "string", "minLength": 1, "maxLength": 120},
+                                "icon": {"type": "string", "minLength": 0, "maxLength": 64},
+                                "route": {"type": "string", "minLength": 0, "maxLength": 200},
+                                "params": {"type": "object", "additionalProperties": True},
+                                "badge_rule": {"type": "string", "minLength": 0, "maxLength": 240},
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        "topbar": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["type", "ref", "label"],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "doctype",
+                            "report",
+                            "page",
+                            "workspace",
+                            "url",
+                            "separator",
+                            "heading",
+                            "route",
+                        ],
+                    },
+                    "ref": {"type": "string", "minLength": 1, "maxLength": 140},
+                    "label": {"type": "string", "minLength": 1, "maxLength": 120},
+                    "icon": {"type": "string", "minLength": 0, "maxLength": 64},
+                    "route": {"type": "string", "minLength": 0, "maxLength": 200},
+                    "params": {"type": "object", "additionalProperties": True},
+                    "badge_rule": {"type": "string", "minLength": 0, "maxLength": 240},
+                },
+            },
+        },
+    },
+}

@@ -16,7 +16,7 @@ def bundle_hash(*parts: str) -> str:
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
 
-from galaxy_ui.core.schemas import UI_LAYOUT_PRESET_SCHEMA
+from galaxy_ui.core.schemas import UI_LAYOUT_PRESET_SCHEMA, UI_PANEL_NAVIGATION_SCHEMA_V1
 
 
 def validate_ui_layout_preset(data: dict) -> None:
@@ -37,3 +37,23 @@ def validate_ui_layout_preset(data: dict) -> None:
             frappe.throw("Invalid UI Layout Preset:\n" + "\n".join(msgs))
     except ValidationError as e:
         frappe.throw(f"Invalid UI Layout Preset: {e.message}")
+
+
+def validate_ui_panel_navigation_v1(data: dict) -> None:
+    """
+    Validates Panel Navigation JSON against schema v1.
+    Raises frappe.ValidationError with readable messages when invalid.
+    """
+    import frappe
+
+    try:
+        validator = Draft202012Validator(UI_PANEL_NAVIGATION_SCHEMA_V1)
+        errors = sorted(validator.iter_errors(data), key=lambda e: list(e.path))
+        if errors:
+            msgs = []
+            for e in errors[:8]:
+                path = ".".join([str(p) for p in e.path]) or "(root)"
+                msgs.append(f"{path}: {e.message}")
+            frappe.throw("Invalid UI Panel Navigation:\n" + "\n".join(msgs))
+    except ValidationError as e:
+        frappe.throw(f"Invalid UI Panel Navigation: {e.message}")

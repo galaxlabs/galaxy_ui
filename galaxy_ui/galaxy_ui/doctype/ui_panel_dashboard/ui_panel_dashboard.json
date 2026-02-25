@@ -1,17 +1,13 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2026-02-24 01:21:18.427512",
+ "creation": "2026-02-25 00:00:00.000000",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "title",
-  "is_active",
   "is_default",
-  "column_break_1",
-  "nav_hash",
-  "navigation_json",
-  "notes_section",
+  "dashboard_json",
   "notes"
  ],
  "fields": [
@@ -24,41 +20,18 @@
   },
   {
    "default": "1",
-   "fieldname": "is_active",
-   "fieldtype": "Check",
-   "in_list_view": 1,
-   "label": "Is Active"
-  },
-  {
-   "default": "1",
    "fieldname": "is_default",
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Is Default"
   },
   {
-   "fieldname": "column_break_1",
-   "fieldtype": "Column Break"
-  },
-  {
-   "description": "Auto-generated hash for caching. Updated when Navigation JSON changes.",
-   "fieldname": "nav_hash",
-   "fieldtype": "Data",
-   "label": "Nav Hash",
-   "read_only": 1
-  },
-  {
-   "description": "Panel navigation JSON (v1): sections + topbar.",
-   "fieldname": "navigation_json",
+   "description": "Panel dashboard JSON definition.",
+   "fieldname": "dashboard_json",
    "fieldtype": "Code",
-   "label": "Navigation JSON",
+   "label": "Dashboard JSON",
    "options": "JSON",
    "reqd": 1
-  },
-  {
-   "fieldname": "notes_section",
-   "fieldtype": "Section Break",
-   "label": "Notes"
   },
   {
    "fieldname": "notes",
@@ -72,7 +45,7 @@
  "modified": "2026-02-25 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Galaxy UI",
- "name": "UI Panel Navigation",
+ "name": "UI Panel Dashboard",
  "owner": "Administrator",
  "permissions": [
   {
