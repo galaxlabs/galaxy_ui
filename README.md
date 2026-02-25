@@ -4,10 +4,6 @@ Production-safe **UI Operating System** for Frappe v15 / ERPNext.
 
 Galaxy UI provides a modern alternative admin panel, no-code UI governance, bridge APIs for external apps, and configurable runtime theming without modifying Frappe core files.
 
-## Interest Tags
-
-`#frappe` `#erpnext` `#admin-panel` `#ui-operating-system` `#design-tokens` `#no-code` `#typescript` `#nextjs` `#api-registry` `#component-library` `#dashboard-builder`
-
 ## What This Repo Delivers
 
 - Alternative panel route for system users: `/app/ui_panel`
