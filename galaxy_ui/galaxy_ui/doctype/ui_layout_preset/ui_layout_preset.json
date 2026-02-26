@@ -10,9 +10,13 @@
   "is_default",
   "column_break_main",
   "shell_style",
+  "apply_scope",
   "layout_hash",
   "targets_json",
   "component_options_json",
+  "component_css_vars_json",
+  "component_classes",
+  "last_resolved_on",
   "effects_json",
   "notes"
  ],
@@ -50,6 +54,13 @@
    "options": "admin\nminimal\nportal"
   },
   {
+   "default": "UI Panel",
+   "fieldname": "apply_scope",
+   "fieldtype": "Select",
+   "label": "Apply Scope",
+   "options": "UI Panel\nDesk\nBoth"
+  },
+  {
    "fieldname": "layout_hash",
    "fieldtype": "Data",
    "label": "Layout Hash",
@@ -63,11 +74,30 @@
    "options": "JSON"
   },
   {
-   "description": "JSON object. Example: {\"card\":\"soft_shadow\"}",
+   "description": "JSON object. Supports map (component->option) or structured variant map. Example: {\"Sidebar\":{\"variant\":\"compact\"},\"Card\":{\"shadow\":\"soft\"}}",
    "fieldname": "component_options_json",
    "fieldtype": "Code",
    "label": "Component Options JSON",
    "options": "JSON"
+  },
+  {
+   "description": "Optional cache of resolved runtime CSS vars.",
+   "fieldname": "component_css_vars_json",
+   "fieldtype": "Code",
+   "label": "Component CSS Vars JSON",
+   "options": "JSON"
+  },
+  {
+   "description": "Optional cached space-separated classes for runtime apply.",
+   "fieldname": "component_classes",
+   "fieldtype": "Small Text",
+   "label": "Component Classes"
+  },
+  {
+   "fieldname": "last_resolved_on",
+   "fieldtype": "Datetime",
+   "label": "Last Resolved On",
+   "read_only": 1
   },
   {
    "description": "JSON object. Example: {\"density\":\"compact\",\"radius_level\":3}",

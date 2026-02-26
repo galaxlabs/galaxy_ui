@@ -29,6 +29,21 @@
   .guip-kpi .value { font-size:22px; font-weight:700; }
   .guip-links { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:10px; }
   .guip-link { border:1px solid var(--ui-border,#e5e7eb); border-radius:10px; padding:10px; cursor:pointer; background:var(--ui-card,#fff); }
+  .guip-status-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .guip-status-item { border:1px solid var(--ui-border,#e5e7eb); border-radius:10px; padding:10px; }
+  .guip-status-label { font-size:12px; color:var(--ui-text-muted,#6b7280); margin-bottom:4px; }
+  .guip-status-value { font-weight:600; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .guip-badge { display:inline-block; border-radius:999px; padding:2px 8px; font-size:11px; font-weight:700; }
+  .guip-badge-pass { background:#dcfce7; color:#166534; }
+  .guip-badge-fail { background:#fee2e2; color:#991b1b; }
+  .guip-badge-warn { background:#fef3c7; color:#92400e; }
+  .guip-badge-na { background:#e5e7eb; color:#374151; }
+  .guip-wizard-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .guip-wizard-action { border:1px solid var(--ui-border,#e5e7eb); border-radius:10px; padding:10px; }
+  .guip-wizard-action .btn { margin-bottom:6px; }
+  .guip-checklist { display:flex; flex-direction:column; gap:8px; }
+  .guip-check-item { border:1px solid var(--ui-border,#e5e7eb); border-radius:10px; padding:10px; }
+  .guip-check-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
   .guip-row-glow .guip-table tbody tr:hover { background: var(--guip-row-hover, rgba(37,99,235,.12)); }
   .guip-sidebar-compact .guip-body { grid-template-columns: var(--guip-sidebar-width, 280px) 1fr; }
   .guip-btn-rounded .btn { border-radius: 999px; }
@@ -37,6 +52,7 @@
     .guip-sidebar { border-right:0; border-bottom:1px solid var(--ui-border,#e5e7eb); }
     .guip-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
     .guip-links { grid-template-columns:1fr; }
+    .guip-status-grid, .guip-wizard-grid { grid-template-columns:1fr; }
   }
   `;
   const style = document.createElement("style");
@@ -171,9 +187,34 @@ function galaxy_ui_panel_on_page_load(wrapper) {
     return { type, ref, route, label, params: it.params || {} };
   }
 
+  function build_panel_nav() {
+    const base = state.nav && Array.isArray(state.nav.sections)
+      ? JSON.parse(JSON.stringify(state.nav))
+      : { sections: [], topbar: [] };
+    const hasControlCenter = (base.sections || []).some((section) => (
+      (section.items || []).some((it) => String((it && (it.ref || it.route || "") || "")).includes("control-center"))
+    ));
+    if (!hasControlCenter) {
+      base.sections = [{
+        label: "Galaxy UI",
+        items: [
+          {
+            type: "route",
+            ref: "control-center",
+            route: "#/control-center",
+            label: "Control Center",
+            icon: "settings",
+          },
+        ],
+      }].concat(base.sections || []);
+    }
+    return base;
+  }
+
   function render_nav() {
+    const nav = build_panel_nav();
     const parts = [];
-    for (const section of (state.nav.sections || [])) {
+    for (const section of (nav.sections || [])) {
       parts.push(`<div class="guip-nav-title">${esc(section.label || "Section")}</div>`);
       for (const rawItem of (section.items || [])) {
         const item = normalize_item(rawItem);
@@ -186,6 +227,77 @@ function galaxy_ui_panel_on_page_load(wrapper) {
       parts.push('<div class="text-muted">No navigation configured.</div>');
     }
     $shell.find(".guip-nav-host").html(parts.join(""));
+  }
+
+  function badge_class(status) {
+    const s = String(status || "").toUpperCase();
+    if (s === "PASS") return "guip-badge guip-badge-pass";
+    if (s === "FAIL") return "guip-badge guip-badge-fail";
+    if (s === "WARN") return "guip-badge guip-badge-warn";
+    return "guip-badge guip-badge-na";
+  }
+
+  async function render_control_center() {
+    const [statusRes, checksRes] = await Promise.all([
+      frappe.call("galaxy_ui.api.control_center.get_status"),
+      frappe.call("galaxy_ui.api.control_center.run_health_checks"),
+    ]);
+    const status = statusRes.message || {};
+    const checks = (checksRes.message && checksRes.message.checks) || [];
+
+    const theme = status.active_theme || {};
+    const layout = status.active_layout_preset || {};
+    const nav = status.active_navigation_profile || {};
+    const flags = status.feature_flags || {};
+
+    const fmtFlag = (v) => (String(v) === "1" || v === 1 || v === true ? "Enabled" : (String(v) === "0" || v === 0 || v === false ? "Disabled" : "N/A"));
+
+    const statusHtml = `
+      <div class="guip-status-grid">
+        <div class="guip-status-item"><div class="guip-status-label">Active Theme</div><div class="guip-status-value">${esc(theme.name || "-")} <span class="${badge_class(theme.status || "N/A")}">${esc(theme.status || "N/A")}</span></div></div>
+        <div class="guip-status-item"><div class="guip-status-label">Active Layout Preset</div><div class="guip-status-value">${esc(layout.title || layout.name || "-")}</div></div>
+        <div class="guip-status-item"><div class="guip-status-label">Active Navigation Profile</div><div class="guip-status-value">${esc(nav.title || nav.name || "-")} <span class="${badge_class(nav.status || "N/A")}">${esc(nav.status || "N/A")}</span></div></div>
+        <div class="guip-status-item"><div class="guip-status-label">Theme Publish Status</div><div class="guip-status-value"><span class="${badge_class(theme.status || "N/A")}">${esc(theme.status || "N/A")}</span></div></div>
+        <div class="guip-status-item"><div class="guip-status-label">Feature Flags</div><div class="guip-status-value">Bridge: ${esc(fmtFlag(flags.bridge))}</div></div>
+        <div class="guip-status-item"><div class="guip-status-label">Feature Flags</div><div class="guip-status-value">Registry: ${esc(fmtFlag(flags.registry))}, Builder: ${esc(fmtFlag(flags.builder))}</div></div>
+      </div>
+    `;
+
+    const wizardHtml = `
+      <div class="guip-wizard-grid">
+        <div class="guip-wizard-action"><button class="btn btn-sm btn-primary guip-cc-action" data-action="seed_defaults">Seed Defaults</button><div class="text-muted small">Create baseline theme/layout/navigation/components if missing.</div></div>
+        <div class="guip-wizard-action"><button class="btn btn-sm btn-default guip-cc-action" data-action="apply_active_theme">Apply Active Theme</button><div class="text-muted small">Publishes and reapplies current active theme bundle.</div></div>
+        <div class="guip-wizard-action"><button class="btn btn-sm btn-default guip-cc-action" data-action="apply_active_layout">Apply Active Layout</button><div class="text-muted small">Applies current default/active layout preset to active theme.</div></div>
+        <div class="guip-wizard-action"><button class="btn btn-sm btn-default guip-cc-action" data-action="set_active_navigation">Set Active Navigation</button><div class="text-muted small">Marks selected/default navigation profile as active and published.</div></div>
+        <div class="guip-wizard-action"><button class="btn btn-sm btn-default guip-cc-action" data-action="run_health_checks">Run Health Checks</button><div class="text-muted small">Re-evaluate environment readiness and show latest checklist.</div></div>
+      </div>
+    `;
+
+    const checksHtml = (checks || []).map((row) => `
+      <div class="guip-check-item">
+        <div class="guip-check-head">
+          <div><b>${esc(row.title || row.key || "Check")}</b></div>
+          <span class="${badge_class(row.status)}">${esc(row.status || "N/A")}</span>
+        </div>
+        <div class="small text-muted">${esc(row.hint || "")}</div>
+        ${row.details ? `<div class="small" style="margin-top:4px">${esc(row.details)}</div>` : ""}
+      </div>
+    `).join("") || '<div class="text-muted">No checks found.</div>';
+
+    set_body("Control Center", `
+      <div class="guip-card">
+        <h4 style="margin-top:0">Current Status</h4>
+        ${statusHtml}
+      </div>
+      <div class="guip-card">
+        <h4 style="margin-top:0">Setup Wizard</h4>
+        ${wizardHtml}
+      </div>
+      <div class="guip-card">
+        <h4 style="margin-top:0">Health Checks</h4>
+        <div class="guip-checklist">${checksHtml}</div>
+      </div>
+    `);
   }
 
   async function load_dashboard() {
@@ -302,6 +414,14 @@ function galaxy_ui_panel_on_page_load(wrapper) {
     const it = normalize_item(item);
     state.activeItemKey = item_key(it);
     render_nav();
+
+    if (it.ref === "control-center" || it.route === "#/control-center") {
+      if ((window.location.hash || "").trim() !== "#/control-center") {
+        window.location.hash = "/control-center";
+      }
+      await render_control_center();
+      return;
+    }
 
     if (it.type === "doctype" && it.ref) {
       await load_doctype_list(it.ref);
@@ -466,7 +586,12 @@ function galaxy_ui_panel_on_page_load(wrapper) {
     }
     apply_layout();
     render_nav();
+    if ((window.location.hash || "").trim() === "#/control-center") {
+      await activate_item({ type: "route", ref: "control-center", route: "#/control-center", label: "Control Center" });
+      return;
+    }
     if (is_feature_enabled("dashboard")) {
+      state.activeItemKey = "";
       await load_dashboard();
     } else {
       set_body("Dashboard Disabled", '<div class="text-muted">Panel dashboard is disabled by feature flag.</div>');
@@ -481,6 +606,9 @@ function galaxy_ui_panel_on_page_load(wrapper) {
     if (!is_feature_enabled("dashboard")) {
       frappe.msgprint(__("Dashboard feature is disabled"));
       return;
+    }
+    if ((window.location.hash || "").trim()) {
+      history.replaceState(null, "", window.location.pathname);
     }
     await load_dashboard();
   });
@@ -567,6 +695,18 @@ function galaxy_ui_panel_on_page_load(wrapper) {
 
   $shell.on("click", ".guip-link", function () {
     open_route($(this).data("route"));
+  });
+
+  $shell.on("click", ".guip-cc-action", async function () {
+    const action = String($(this).data("action") || "").trim();
+    if (!action) return;
+    try {
+      await frappe.call(`galaxy_ui.api.control_center.${action}`);
+      frappe.show_alert({ message: __("Control Center action completed"), indicator: "green" });
+      await load_bundle();
+    } catch (e) {
+      frappe.msgprint(__(e.message || "Control Center action failed"));
+    }
   });
 
   load_bundle().catch((e) => {

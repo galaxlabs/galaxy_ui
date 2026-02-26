@@ -8,6 +8,10 @@
  "field_order": [
   "enabled",
   "is_published",
+  "status_section",
+  "status",
+  "published_by",
+  "published_on",
   "title",
   "template_type",
   "source_doctype",
@@ -18,7 +22,7 @@
  ],
  "fields": [
   {
-   "default": "1",
+   "default": "0",
    "fieldname": "enabled",
    "fieldtype": "Check",
    "in_list_view": 1,
@@ -30,6 +34,31 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Is Published"
+  },
+  {
+   "fieldname": "status_section",
+   "fieldtype": "Section Break",
+   "label": "Governance"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nPublished"
+  },
+  {
+   "fieldname": "published_by",
+   "fieldtype": "Link",
+   "label": "Published By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "published_on",
+   "fieldtype": "Datetime",
+   "label": "Published On",
+   "read_only": 1
   },
   {
    "fieldname": "title",

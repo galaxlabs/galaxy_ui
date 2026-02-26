@@ -1,0 +1,285 @@
+1) BRANCH + LAST COMMIT
+develop
+581f5bc feat(panel): improve panel API and UI runtime sync
+
+2) CANONICAL PANEL + CONTROL CENTER ENTRY FILES
+docs/CONTROL_CENTER.md:5:Control Center is an internal admin screen inside `/app/ui_panel#/control-center` for operating Galaxy UI safely.
+docs/CONTROL_CENTER.md:74:- Open `/app/ui_panel#/control-center`.
+galaxy_ui/api/control_center.py:474:                        {"type": "route", "ref": "/app/ui_panel", "label": "Dashboard", "icon": "dashboard"},
+galaxy_ui/api/control_center.py:475:                        {"type": "route", "ref": "#/control-center", "label": "Control Center", "icon": "settings"},
+galaxy_ui/api/panel.py:123:    If runtime still has older bundle.py loaded (without validate_ui_panel_navigation_v1),
+galaxy_ui/api/panel.py:127:        from galaxy_ui.core.bundle import validate_ui_panel_navigation_v1 as validator  # type: ignore
+galaxy_ui/api/panel.py:310:        source = "ui_panel_navigation"
+galaxy_ui/api/panel.py:402:def get_panel_bundle():
+galaxy_ui/api/panel.py:417:            "panel_route": "/app/ui_panel",
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.json:10: "name": "ui_panel",
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.json:12: "page_name": "ui_panel",
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:1:(function inject_ui_panel_css() {
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:64:function galaxy_ui_panel_on_page_load(wrapper) {
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:195:      (section.items || []).some((it) => String((it && (it.ref || it.route || "") || "")).includes("control-center"))
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:203:            ref: "control-center",
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:204:            route: "#/control-center",
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:240:  async function render_control_center() {
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:242:      frappe.call("galaxy_ui.api.control_center.get_status"),
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:243:      frappe.call("galaxy_ui.api.control_center.run_health_checks"),
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:399:      window.location.href = `/app/ui_panel${r}`;
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:418:    if (it.ref === "control-center" || it.route === "#/control-center") {
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:419:      if ((window.location.hash || "").trim() !== "#/control-center") {
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:420:        window.location.hash = "/control-center";
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:422:      await render_control_center();
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:570:    const r = await frappe.call("galaxy_ui.api.panel.get_panel_bundle");
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:589:    if ((window.location.hash || "").trim() === "#/control-center") {
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:590:      await activate_item({ type: "route", ref: "control-center", route: "#/control-center", label: "Control Center" });
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:704:      await frappe.call(`galaxy_ui.api.control_center.${action}`);
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:717:["ui_panel"].forEach((pageKey) => {
+galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js:719:  frappe.pages[pageKey].on_page_load = galaxy_ui_panel_on_page_load;
+
+3) CONTROL CENTER API ENDPOINTS
+232:@frappe.whitelist(allow_guest=False)
+233:def get_status():
+238:@frappe.whitelist(allow_guest=False)
+239:def run_health_checks():
+400:@frappe.whitelist(allow_guest=False)
+401:def seed_defaults():
+516:@frappe.whitelist(allow_guest=False)
+517:def apply_active_theme(theme_name: str | None = None):
+529:@frappe.whitelist(allow_guest=False)
+530:def apply_active_layout(preset_name: str | None = None):
+538:@frappe.whitelist(allow_guest=False)
+539:def set_active_navigation(profile_name: str | None = None):
+
+4) ALL WHITELISTED API ENDPOINTS (galaxy_ui/api)
+galaxy_ui/api/navigation.py:5:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:288:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:329:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:401:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:422:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:477:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:536:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:564:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:584:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:606:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:622:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/panel.py:635:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/layout.py:45:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/layout.py:60:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/layout.py:78:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/layout.py:137:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/layout.py:162:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/component.py:52:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/component.py:82:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/component.py:113:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/component.py:183:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/bridge.py:142:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/bridge.py:156:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/bridge.py:174:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/publish.py:7:@frappe.whitelist()
+galaxy_ui/api/publish.py:69:@frappe.whitelist()
+galaxy_ui/api/theme.py:73:@frappe.whitelist()
+galaxy_ui/api/theme.py:152:@frappe.whitelist()
+galaxy_ui/api/theme.py:186:@frappe.whitelist()
+galaxy_ui/api/registry.py:182:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/registry.py:358:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/registry.py:385:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/registry.py:395:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/control_center.py:232:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/control_center.py:238:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/control_center.py:400:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/control_center.py:516:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/control_center.py:529:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/control_center.py:538:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/builder.py:36:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/builder.py:52:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/builder.py:73:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/builder.py:119:@frappe.whitelist(allow_guest=False)
+galaxy_ui/api/builder.py:161:@frappe.whitelist(allow_guest=False)
+
+5) DOCTYPES (FOCUS + REFERENCED BY CONTROL CENTER)
+__pycache__
+portal_card
+portal_permission_map
+portal_section
+portal_workspace
+ui_api_registry
+ui_app_config
+ui_component
+ui_component_option
+ui_layout_preset
+ui_panel_dashboard
+ui_panel_navigation
+ui_preset
+ui_rule
+ui_theme
+ui_token
+ui_view_template
+
+17:    "UI Theme",
+18:    "UI Token",
+19:    "UI Panel Navigation",
+20:    "UI App Config",
+21:    "UI API Registry",
+22:    "UI Component",
+23:    "UI Component Option",
+24:    "UI View Template",
+100:    if not _dt_exists("UI Theme"):
+102:    names = frappe.get_all("UI Theme", filters={"is_active": 1}, pluck="name", order_by="modified desc", limit=1)
+104:        names = frappe.get_all("UI Theme", pluck="name", order_by="modified desc", limit=1)
+105:    return frappe.get_doc("UI Theme", names[0]) if names else None
+109:    if not _dt_exists("UI Layout Preset"):
+112:        "UI Layout Preset",
+118:    return frappe.get_doc("UI Layout Preset", names[0]) if names else None
+122:    if not _dt_exists("UI Panel Navigation"):
+125:        "UI Panel Navigation",
+133:            "UI Panel Navigation",
+140:        names = frappe.get_all("UI Panel Navigation", pluck="name", order_by="modified desc", limit=1)
+141:    return frappe.get_doc("UI Panel Navigation", names[0]) if names else None
+212:            "themes": _safe_count("UI Theme"),
+213:            "layout_presets": _safe_count("UI Layout Preset"),
+214:            "navigation_profiles": _safe_count("UI Panel Navigation"),
+215:            "app_configs": _safe_count("UI App Config"),
+216:            "registry_keys": _safe_count("UI API Registry"),
+217:            "components": _safe_count("UI Component"),
+218:            "component_options": _safe_count("UI Component Option"),
+219:            "view_templates": _safe_count("UI View Template"),
+256:    if _dt_exists("UI Layout Preset") or _dt_exists("UI Preset"):
+264:                "Create/migrate UI Layout Preset (or legacy UI Preset) DocType.",
+279:                    "Publish or activate a theme from UI Theme.",
+343:                "Run Seed Defaults or set an active UI Panel Navigation profile.",
+347:    preset_count = _safe_count("UI Layout Preset")
+356:                "Run Seed Defaults to create a baseline UI Layout Preset.",
+363:        if _dt_exists("UI API Registry"):
+364:            published_registry_keys = cint(frappe.db.count("UI API Registry", filters={"enabled": 1}) or 0)
+373:                    "Create a UI API Registry key and publish it.",
+381:        if _dt_exists("UI App Config"):
+382:            bridge_count = cint(frappe.db.count("UI App Config", filters={"enabled": 1}) or 0)
+391:                    "Create an enabled UI App Config record.",
+408:        if not frappe.db.exists("UI Theme", theme_name):
+411:                    "doctype": "UI Theme",
+439:            theme_doc = frappe.get_doc("UI Theme", theme_name)
+447:    if _safe_count("UI Layout Preset") == 0:
+450:                "doctype": "UI Layout Preset",
+468:    if _safe_count("UI Panel Navigation") == 0:
+483:                        {"type": "doctype", "ref": "UI Theme", "label": "UI Themes", "icon": "palette"},
+484:                        {"type": "doctype", "ref": "UI Layout Preset", "label": "UI Presets", "icon": "sliders-h"},
+492:                "doctype": "UI Panel Navigation",
+506:    if _safe_count("UI Component") == 0 or _safe_count("UI Component Option") == 0:
+519:    target_name = _find_target_name("UI Theme", theme_name, {"is_active": 1})
+520:    doc = frappe.get_doc("UI Theme", target_name)
+532:    target_preset = _find_target_name("UI Layout Preset", preset_name, {"enabled": 1, "is_default": 1})
+533:    target_theme = _find_target_name("UI Theme", None, {"is_active": 1})
+541:    target_name = _find_target_name("UI Panel Navigation", profile_name, {"is_active": 1})
+542:    doc = frappe.get_doc("UI Panel Navigation", target_name)
+
+6) HOOKS + ASSET LOADER
+28:app_include_css = [
+34:app_include_js = [
+41:website_include_css = [
+46:website_include_js = [
+58:# page_js = {"page" : "public/js/file.js"}
+61:# doctype_js = {"doctype" : "public/js/doctype.js"}
+
+galaxy_ui/public/ui/runtime/cards.js
+galaxy_ui/public/ui/runtime/loader.js
+galaxy_ui/public/ui/runtime/rules.js
+galaxy_ui/public/ui/styles/base.css
+galaxy_ui/public/ui/styles/components.css
+galaxy_ui/public/ui/styles/skin.css
+
+7) PATCHES
+     1	[pre_model_sync]
+     2	# Patches added in this section will be executed before doctypes are migrated
+     3	# Read docs to understand patches: https://frappeframework.com/docs/v14/user/en/database-migrations
+     4	
+     5	[post_model_sync]
+     6	# Patches added in this section will be executed after doctypes are migrated
+     7	galaxy_ui.patches.v15_0.migrate_ui_panel_navigation_single_to_records
+     8	galaxy_ui.patches.v15_0.seed_default_ui_panel_dashboard
+
+galaxy_ui/patches/__init__.py
+galaxy_ui/patches/v15_0/__init__.py
+galaxy_ui/patches/v15_0/migrate_ui_panel_navigation_single_to_records.py
+galaxy_ui/patches/v15_0/seed_default_ui_panel_dashboard.py
+
+8) WORKTREE STATUS
+ M galaxy_ui/galaxy_ui/doctype/ui_panel_navigation/ui_panel_navigation.json
+ M galaxy_ui/galaxy_ui/doctype/ui_panel_navigation/ui_panel_navigation.py
+ M galaxy_ui/galaxy_ui/doctype/ui_view_template/ui_view_template.json
+ M galaxy_ui/galaxy_ui/page/ui_panel/ui_panel.js
+?? CODEX_AUDIT_REPORT.txt
+?? docs/CONTROL_CENTER.md
+?? galaxy_ui/api/control_center.py
+
+9) TREE -L 3
+.
+├── CODEX_AUDIT_REPORT.txt
+├── README.md
+├── docs
+│   ├── APP_BRIEF.md
+│   ├── CONTROL_CENTER.md
+│   ├── GETTING_STARTED.md
+│   ├── INTEGRATION_SDK.md
+│   ├── PHASE_SUMMARY.md
+│   └── sdk
+│       └── galaxy-ui-client.ts
+├── galaxy_ui
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc
+│   │   └── hooks.cpython-312.pyc
+│   ├── api
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── bridge.py
+│   │   ├── builder.py
+│   │   ├── component.py
+│   │   ├── control_center.py
+│   │   ├── layout.py
+│   │   ├── navigation.py
+│   │   ├── panel.py
+│   │   ├── publish.py
+│   │   ├── registry.py
+│   │   └── theme.py
+│   ├── config
+│   │   ├── __init__.py
+│   │   └── __pycache__
+│   ├── core
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── bundle.py
+│   │   ├── schemas.py
+│   │   └── tokens.py
+│   ├── galaxy_ui
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── doctype
+│   │   └── page
+│   ├── hooks.py
+│   ├── modules.txt
+│   ├── patches
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   └── v15_0
+│   ├── patches.txt
+│   ├── public
+│   │   ├── css
+│   │   ├── js
+│   │   └── ui
+│   └── templates
+│       ├── __init__.py
+│       ├── __pycache__
+│       └── pages
+├── license.txt
+├── pyproject.toml
+└── scripts
+    ├── hooks_snippet.txt
+    └── init_ui_system_structure.sh
+
+26 directories, 37 files
+
+10) NEXT PHASE A CHECKLIST (UPDATED)
+- [x] Control Center endpoints implemented
+- [x] Control Center UI in /app/ui_panel#/control-center
+- [x] Setup wizard actions wired
+- [x] Health checklist implemented
+- [x] Docs added: docs/CONTROL_CENTER.md
+- [ ] Optional: add dedicated UI Settings singleton for explicit active pointers

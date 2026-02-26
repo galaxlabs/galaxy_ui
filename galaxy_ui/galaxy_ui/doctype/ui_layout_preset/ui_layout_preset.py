@@ -17,7 +17,11 @@ class UILayoutPreset(Document):
 
         targets = _json_obj(self.targets_json, "targets_json", list, default=["panel"])
         component_options = _json_obj(self.component_options_json, "component_options_json", dict, default={})
+        component_css_vars = _json_obj(self.component_css_vars_json, "component_css_vars_json", dict, default={})
         effects = _json_obj(self.effects_json, "effects_json", dict, default={})
+        self.apply_scope = (self.apply_scope or "UI Panel").strip()
+        if self.apply_scope not in {"UI Panel", "Desk", "Both"}:
+            frappe.throw("apply_scope must be one of: UI Panel, Desk, Both")
 
         payload = {
             "name": self.title,
@@ -32,6 +36,10 @@ class UILayoutPreset(Document):
         self.layout_hash = bundle_hash(frappe.as_json(payload, indent=None))
         self.targets_json = json.dumps(targets, separators=(",", ":"))
         self.component_options_json = json.dumps(component_options, separators=(",", ":"))
+        self.component_css_vars_json = json.dumps(component_css_vars, separators=(",", ":"))
+        self.component_classes = " ".join(
+            [part.strip() for part in (self.component_classes or "").split() if part.strip()]
+        )
         self.effects_json = json.dumps(effects, separators=(",", ":"))
 
     def on_update(self):

@@ -42,6 +42,20 @@ def _validate_navigation(data: dict) -> None:
 
 class UIPanelNavigation(Document):
     def validate(self):
+        # Governance: Draft records cannot be active
+        if (self.status or "Draft") != "Published":
+            self.is_active = 0
+            self.published_on = None
+            self.published_by = None
+
+        # If active, force publish + set metadata
+        if self.is_active:
+            self.status = "Published"
+            if not self.published_on:
+                self.published_on = frappe.utils.now_datetime()
+            if not self.published_by:
+                self.published_by = frappe.session.user
+
         self.title = (self.title or self.name or "").strip()
         if not self.title:
             frappe.throw("Title is required")
