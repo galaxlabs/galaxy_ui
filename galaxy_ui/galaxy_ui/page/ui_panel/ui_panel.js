@@ -62,6 +62,7 @@ function galaxy_ui_panel_on_page_load(wrapper) {
     nav: { sections: [], topbar: [] },
     activeItemKey: "",
     appliedShellClasses: [],
+    features: {},
   };
 
   const $root = $(wrapper).find(".layout-main-section");
@@ -74,6 +75,9 @@ function galaxy_ui_panel_on_page_load(wrapper) {
         <div class="guip-actions">
           <button class="btn btn-default btn-sm guip-go-desk">Desk</button>
           <button class="btn btn-default btn-sm guip-go-home">Dashboard</button>
+          <button class="btn btn-default btn-sm guip-navigation">Navigation</button>
+          <button class="btn btn-default btn-sm guip-registry">Registry</button>
+          <button class="btn btn-default btn-sm guip-bridge">Bridge</button>
           <button class="btn btn-default btn-sm guip-builder">Builder</button>
           <button class="btn btn-default btn-sm guip-components">Components</button>
           <button class="btn btn-default btn-sm guip-appearance">Appearance</button>
@@ -107,6 +111,23 @@ function galaxy_ui_panel_on_page_load(wrapper) {
   function set_body(title, html) {
     $shell.find(".guip-title").html(title || "");
     $shell.find(".guip-body-host").html(html || "");
+  }
+
+  function is_feature_enabled(name) {
+    const raw = (state.features && Object.prototype.hasOwnProperty.call(state.features, name))
+      ? state.features[name]
+      : 1;
+    return String(raw) === "1" || raw === true;
+  }
+
+  function apply_feature_flags() {
+    $shell.find(".guip-appearance").toggle(is_feature_enabled("appearance"));
+    $shell.find(".guip-builder").toggle(is_feature_enabled("builder"));
+    $shell.find(".guip-components").toggle(is_feature_enabled("components"));
+    $shell.find(".guip-go-home").toggle(is_feature_enabled("dashboard"));
+    $shell.find(".guip-navigation").toggle(is_feature_enabled("navigation"));
+    $shell.find(".guip-registry").toggle(is_feature_enabled("registry"));
+    $shell.find(".guip-bridge").toggle(is_feature_enabled("bridge"));
   }
 
   function apply_layout() {
@@ -429,6 +450,10 @@ function galaxy_ui_panel_on_page_load(wrapper) {
     const r = await frappe.call("galaxy_ui.api.panel.get_panel_bundle");
     state.bundle = r.message || {};
     state.nav = ((state.bundle.navigation || {}).navigation) || { sections: [], topbar: [] };
+    state.features = (state.bundle.features && typeof state.bundle.features === "object")
+      ? state.bundle.features
+      : {};
+    apply_feature_flags();
     try {
       const layout = (state.bundle.theme || {}).layout || {};
       const componentOptions = (layout && typeof layout === "object") ? (layout.component_options || {}) : {};
@@ -441,7 +466,11 @@ function galaxy_ui_panel_on_page_load(wrapper) {
     }
     apply_layout();
     render_nav();
-    await load_dashboard();
+    if (is_feature_enabled("dashboard")) {
+      await load_dashboard();
+    } else {
+      set_body("Dashboard Disabled", '<div class="text-muted">Panel dashboard is disabled by feature flag.</div>');
+    }
   }
 
   $shell.on("click", ".guip-refresh", async function () {
@@ -449,6 +478,10 @@ function galaxy_ui_panel_on_page_load(wrapper) {
   });
 
   $shell.on("click", ".guip-go-home", async function () {
+    if (!is_feature_enabled("dashboard")) {
+      frappe.msgprint(__("Dashboard feature is disabled"));
+      return;
+    }
     await load_dashboard();
   });
 
@@ -457,14 +490,50 @@ function galaxy_ui_panel_on_page_load(wrapper) {
   });
 
   $shell.on("click", ".guip-appearance", async function () {
+    if (!is_feature_enabled("appearance")) {
+      frappe.msgprint(__("Appearance feature is disabled"));
+      return;
+    }
     await open_appearance_dialog();
   });
 
   $shell.on("click", ".guip-builder", async function () {
+    if (!is_feature_enabled("builder")) {
+      frappe.msgprint(__("Builder feature is disabled"));
+      return;
+    }
     await open_builder_dialog();
   });
 
+  $shell.on("click", ".guip-navigation", function () {
+    if (!is_feature_enabled("navigation")) {
+      frappe.msgprint(__("Navigation feature is disabled"));
+      return;
+    }
+    window.location.href = "/app/ui-panel-navigation";
+  });
+
+  $shell.on("click", ".guip-registry", function () {
+    if (!is_feature_enabled("registry")) {
+      frappe.msgprint(__("Registry feature is disabled"));
+      return;
+    }
+    window.location.href = "/app/ui-api-registry";
+  });
+
+  $shell.on("click", ".guip-bridge", function () {
+    if (!is_feature_enabled("bridge")) {
+      frappe.msgprint(__("Bridge feature is disabled"));
+      return;
+    }
+    window.location.href = "/app/ui-app-config";
+  });
+
   $shell.on("click", ".guip-components", async function () {
+    if (!is_feature_enabled("components")) {
+      frappe.msgprint(__("Components feature is disabled"));
+      return;
+    }
     await frappe.confirm(
       __("Seed default component options if missing and open UI Component Option list?"),
       async () => {

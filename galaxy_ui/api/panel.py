@@ -56,6 +56,16 @@ DEFAULT_DASHBOARD_JSON = {
     ],
 }
 
+DEFAULT_PANEL_FEATURES = {
+    "appearance": 1,
+    "builder": 1,
+    "components": 1,
+    "dashboard": 1,
+    "navigation": 1,
+    "registry": 1,
+    "bridge": 1,
+}
+
 
 def _ensure_system_user() -> None:
     if frappe.session.user == "Guest":
@@ -63,6 +73,39 @@ def _ensure_system_user() -> None:
     user_type = frappe.get_cached_value("User", frappe.session.user, "user_type")
     if user_type != "System User":
         frappe.throw("Galaxy UI Panel is available to System Users only")
+
+
+def _as_feature_bool(value, default: int = 0) -> int:
+    if value in (None, ""):
+        return cint(default or 0)
+    if isinstance(value, bool):
+        return 1 if value else 0
+    if isinstance(value, (int, float)):
+        return 1 if cint(value) else 0
+    return 1 if str(value).strip().lower() in {"1", "true", "yes", "on", "y"} else 0
+
+
+def _panel_feature_flags(theme_bundle: dict | None = None) -> dict:
+    features = dict(DEFAULT_PANEL_FEATURES)
+
+    # Site-level override from site_config.json:
+    # "galaxy_ui_features": {"builder": 0, "appearance": 1, ...}
+    raw_override = frappe.conf.get("galaxy_ui_features")
+    override = {}
+    if isinstance(raw_override, str):
+        try:
+            override = frappe.parse_json(raw_override) or {}
+        except Exception:
+            override = {}
+    elif isinstance(raw_override, dict):
+        override = raw_override
+
+    if isinstance(override, dict):
+        for key in features:
+            if key in override:
+                features[key] = _as_feature_bool(override.get(key), features[key])
+
+    return features
 
 
 def _parse_navigation(raw_json: str) -> dict:
@@ -361,15 +404,17 @@ def get_panel_bundle():
 
     theme_bundle = get_active_theme_bundle()
     navigation_bundle = get_active_navigation()
+    features = _panel_feature_flags(theme_bundle)
 
     return {
         "theme": theme_bundle,
         "navigation": navigation_bundle,
+        "features": features,
         "env": {
             "site": frappe.local.site,
             "user": frappe.session.user,
             "is_system_user": 1,
-            "panel_route": "/app/ui-panel",
+            "panel_route": "/app/ui_panel",
         },
     }
 

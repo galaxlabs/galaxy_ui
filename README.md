@@ -87,6 +87,22 @@ docs/
 - `galaxy_ui.api.layout.get_appearance_options`
 - `galaxy_ui.api.layout.apply_panel_appearance`
 
+### Panel Feature Flags
+- `get_panel_bundle` now returns `features` for UI gating:
+  - `appearance`, `builder`, `components`, `dashboard`, `navigation`, `registry`, `bridge`
+- Optional site-level override in `site_config.json`:
+
+```json
+{
+  "galaxy_ui_features": {
+    "builder": 0,
+    "components": 1,
+    "appearance": 1,
+    "dashboard": 1
+  }
+}
+```
+
 ### Bridge (External Apps)
 - `galaxy_ui.api.bridge.get_ui_app_config`
 - `galaxy_ui.api.bridge.get_ui_nav`
