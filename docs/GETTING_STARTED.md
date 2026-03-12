@@ -50,6 +50,37 @@ Click **Appearance**.
 
 Changes apply instantly in panel runtime.
 
+### 3.0) Seed ready-made panel color variants (C1.1)
+
+In the **Appearance** dialog click **Seed Theme Variants** once.
+
+This creates idempotent internal presets (safe to run again):
+- `Panel Aura Mint`
+- `Panel Ocean Glass`
+- `Panel Ember Sand`
+
+Then select one in **Color Scheme (Theme)** and click **Apply**.
+These are tuned for `/app/ui_panel` styling tokens and are intended for panel-first usage.
+
+### 3.1) Create a layout variant (component runtime)
+
+Open `UI Layout Preset` and edit:
+
+- `component_options_json` (JSON map)
+- `apply_scope` (`UI Panel` recommended for now)
+
+Example:
+
+```json
+{
+  "Sidebar": { "variant": "compact", "density": "dense" },
+  "Card": { "shadow": "soft" },
+  "ListRow": { "hover": "tint" }
+}
+```
+
+Then click **Resolve Component Runtime** in the preset form (or from panel topbar `Resolve Runtime`), and set preset as default/enabled.
+
 ### 4) Confirm navigation
 
 Ensure an active `UI Panel Navigation` profile exists.
@@ -58,6 +89,20 @@ If sidebar is empty:
 - Create/update profile in `UI Panel Navigation`
 - Set `is_active = 1`
 - Add `navigation_json` sections/items
+
+For in-panel DocType list pages, add items like:
+
+```json
+{
+  "type": "doctype",
+  "ref": "Customer",
+  "label": "Customers",
+  "icon": "users"
+}
+```
+
+This opens in-panel route:
+- `#/doctype/Customer`
 
 ### 5) Verify dashboard source
 
@@ -79,6 +124,17 @@ Use `/app/ui_panel`.
 Use sidebar items:
 - `doctype` type: inline list render
 - `report/page/url/route` types: opens corresponding route
+
+DocType list renderer supports:
+- search (name/title)
+- pagination (prev/next)
+- safe field subset only
+- row click to native form route (`/app/<doctype>/<name>`)
+
+Intentionally not supported in this phase:
+- advanced filters/query builder
+- report builder
+- full embedded form editor
 
 ### Quick actions
 
@@ -152,12 +208,15 @@ Runtime endpoint:
   - `css_vars_json`
   - `classes_json`
 
-### How panel consumes this
+### How panel consumes this (B1 runtime)
 
-Panel reads `layout.component_options` mapping, then resolves via:
-- `galaxy_ui.api.component.resolve_component_options`
+Panel reads active `UI Layout Preset.component_options_json` and resolves via:
+- `galaxy_ui.core.component_runtime.resolve_layout_preset_runtime_doc`
+- `galaxy_ui.api.layout.resolve_layout_preset_runtime` (manual resolve endpoint)
 
-Resolved variables/classes are applied to panel shell at runtime.
+Bundle includes `resolved_component_runtime` and panel applies it through:
+- style tag `#galaxy-ui-component-runtime`
+- root class set on `.ui-panel-root`
 
 ## Canonical Records to Know
 

@@ -1,1 +1,70 @@
-/* OPTIONAL components layer (chips, badges, cards, etc.) */
+/* Galaxy UI component runtime layer (layout preset variants) */
+.ui-panel-root {
+  --ui-sidebar-width: 300px;
+  --ui-topbar-height: auto;
+  --ui-card-radius: 12px;
+  --ui-card-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  --ui-listrow-hover-bg: rgba(37, 99, 235, 0.12);
+  --ui-panel-density-y: 8px;
+  --ui-panel-density-x: 10px;
+}
+
+.ui-panel-root .guip-topbar {
+  min-height: var(--ui-topbar-height);
+}
+
+.ui-panel-root .guip-sidebar {
+  width: var(--ui-sidebar-width, var(--guip-sidebar-width, 300px));
+}
+
+.ui-panel-root .guip-box,
+.ui-panel-root .guip-card {
+  border-radius: var(--ui-card-radius, var(--guip-radius, 12px));
+  box-shadow: var(--ui-card-shadow, var(--guip-shadow, 0 8px 20px rgba(15, 23, 42, 0.08)));
+}
+
+.ui-panel-root .guip-nav-item,
+.ui-panel-root .guip-topbar .btn {
+  padding-top: var(--ui-panel-density-y);
+  padding-bottom: var(--ui-panel-density-y);
+  padding-left: var(--ui-panel-density-x);
+  padding-right: var(--ui-panel-density-x);
+}
+
+.ui-panel-root .guip-table tbody tr:hover {
+  background: var(--ui-listrow-hover-bg, var(--guip-row-hover, rgba(37, 99, 235, 0.12)));
+}
+
+/* Semantic classes from resolver */
+.ui-panel-root.ui-sidebar-compact {
+  --ui-sidebar-width: 240px;
+}
+
+.ui-panel-root.ui-sidebar-wide {
+  --ui-sidebar-width: 340px;
+}
+
+.ui-panel-root.ui-density-dense {
+  --ui-panel-density-y: 6px;
+  --ui-panel-density-x: 8px;
+}
+
+.ui-panel-root.ui-density-comfortable {
+  --ui-panel-density-y: 10px;
+  --ui-panel-density-x: 12px;
+}
+
+.ui-panel-root.ui-card-soft {
+  --ui-card-shadow: 0 10px 24px rgba(15, 23, 42, 0.10);
+}
+
+.ui-panel-root .ui-panel-list .guip-table thead th {
+  position: sticky;
+  top: 0;
+  background: color-mix(in srgb, var(--ui-card, #fff) 92%, #f8fafc 8%);
+  z-index: 2;
+}
+
+.ui-panel-root .ui-panel-list .guip-table tbody tr {
+  cursor: pointer;
+}

@@ -95,6 +95,37 @@ Delivered:
 - `Builder` action in `ui_panel` topbar
 - Sample template retained for docs: `User List Template`
 
+### Phase B1: Component Options Apply Runtime (Sidebar/Admin Variants)
+
+Status: Completed (v1)
+
+Delivered:
+- Canonical runtime resolver in `core/component_runtime.py`
+- Layout Preset runtime fields:
+  - `component_options_json`
+  - `component_css_vars_json` (cache)
+  - `component_classes` (cache)
+  - `apply_scope` (`UI Panel|Desk|Both`)
+  - `last_resolved_on`
+- New API: `galaxy_ui.api.layout.resolve_layout_preset_runtime`
+- `get_panel_bundle` now returns:
+  - `active_layout_preset`
+  - `resolved_component_runtime` (`css_vars`, `classes`, `warnings`, debug summary)
+- Panel runtime apply uses:
+  - style tag `#galaxy-ui-component-runtime`
+  - root classes on `.ui-panel-root`
+- Backfill patch for existing preset records.
+
+### Phase C1.1: Panel Theme Variant Pack (Color Presets)
+
+Status: Completed (v1)
+
+Delivered:
+- New endpoint: `galaxy_ui.api.theme.seed_panel_theme_variants`
+- System Manager-only, idempotent creation of panel-ready `UI Theme` variants
+- Appearance dialog action: `Seed Theme Variants`
+- New token-aware shell background support via `--guip-shell-bg`
+
 ## Current Data Model (Active)
 
 - `UI Theme`
@@ -115,6 +146,7 @@ Delivered:
 - `galaxy_ui.api.layout.list_layout_presets`
 - `galaxy_ui.api.layout.get_layout_preset`
 - `galaxy_ui.api.layout.apply_layout_preset`
+- `galaxy_ui.api.layout.resolve_layout_preset_runtime`
 - `galaxy_ui.api.layout.get_appearance_options`
 - `galaxy_ui.api.layout.apply_panel_appearance`
 
@@ -178,8 +210,8 @@ Kept intentionally for docs/demo:
 
 ### Components
 - [ ] `Components` action seeds defaults if missing
-- [ ] `layout.component_options` mappings resolve without missing entries
-- [ ] Runtime class/var effects are visible in panel shell
+- [ ] `component_options_json` in preset resolves without hard failures (warnings allowed)
+- [ ] Runtime class/var effects are visible in panel shell (sidebar/card/list variants)
 
 ### Registry
 - [ ] Registry `list` endpoint respects allowed fields/filters
@@ -196,4 +228,3 @@ Kept intentionally for docs/demo:
 - After code updates: run migrate, build app assets, clear site cache.
 - Test environment has test runner disabled unless `allow_tests` is enabled.
 - For production rollout, keep System Manager ownership on all governance DocTypes.
-

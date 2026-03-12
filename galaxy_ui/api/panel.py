@@ -10,6 +10,7 @@ from jsonschema import Draft202012Validator
 
 from galaxy_ui.api.theme import get_active_theme_bundle
 from galaxy_ui.core.bundle import bundle_hash
+from galaxy_ui.core.component_runtime import resolve_layout_preset_runtime_doc
 
 try:
     from galaxy_ui.core.schemas import UI_PANEL_NAVIGATION_SCHEMA_V1
@@ -285,6 +286,21 @@ def _parse_dashboard_json(raw: str) -> dict:
     return parsed
 
 
+def _get_active_layout_preset_doc():
+    if not frappe.db.exists("DocType", "UI Layout Preset"):
+        return None
+    names = frappe.get_all(
+        "UI Layout Preset",
+        filters={"enabled": 1},
+        pluck="name",
+        order_by="is_default desc, modified desc",
+        limit=1,
+    )
+    if not names:
+        return None
+    return frappe.get_doc("UI Layout Preset", names[0])
+
+
 @frappe.whitelist(allow_guest=False)
 def get_active_navigation():
     _ensure_system_user()
@@ -405,11 +421,26 @@ def get_panel_bundle():
     theme_bundle = get_active_theme_bundle()
     navigation_bundle = get_active_navigation()
     features = _panel_feature_flags(theme_bundle)
+    active_layout = _get_active_layout_preset_doc()
+    runtime = resolve_layout_preset_runtime_doc(active_layout, target_scope="UI Panel")
 
     return {
         "theme": theme_bundle,
         "navigation": navigation_bundle,
         "features": features,
+        "active_layout_preset": {
+            "name": active_layout.name if active_layout else None,
+            "title": active_layout.title if active_layout else None,
+            "apply_scope": (active_layout.apply_scope if active_layout else "UI Panel") or "UI Panel",
+        },
+        "resolved_component_runtime": {
+            "css_vars": runtime.get("css_vars") or {},
+            "classes": runtime.get("classes") or [],
+            "warnings": runtime.get("warnings") or [],
+            "matched": runtime.get("matched") or [],
+            "unmatched": runtime.get("unmatched") or [],
+            "active_for_scope": runtime.get("active_for_scope", 1),
+        },
         "env": {
             "site": frappe.local.site,
             "user": frappe.session.user,

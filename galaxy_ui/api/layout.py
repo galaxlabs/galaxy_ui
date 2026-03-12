@@ -7,6 +7,7 @@ from frappe import _
 from frappe.utils import cint
 
 from galaxy_ui.core.bundle import validate_ui_layout_preset
+from galaxy_ui.core.component_runtime import resolve_layout_preset_runtime_doc
 from galaxy_ui.api.theme import get_active_theme_bundle
 
 
@@ -16,6 +17,13 @@ def _ensure_system_user() -> None:
     user_type = frappe.get_cached_value("User", frappe.session.user, "user_type")
     if user_type != "System User":
         frappe.throw(_("Galaxy UI layout center is for System Users only"))
+
+
+def _ensure_manager() -> None:
+    _ensure_system_user()
+    roles = set(frappe.get_roles(frappe.session.user) or [])
+    if "System Manager" not in roles:
+        frappe.throw(_("Only System Manager can modify layout presets"))
 
 
 def _json_or_default(raw, default):
@@ -50,7 +58,17 @@ def list_layout_presets():
 
     return frappe.get_all(
         "UI Layout Preset",
-        fields=["name", "title", "enabled", "is_default", "shell_style", "layout_hash", "modified"],
+        fields=[
+            "name",
+            "title",
+            "enabled",
+            "is_default",
+            "shell_style",
+            "apply_scope",
+            "layout_hash",
+            "last_resolved_on",
+            "modified",
+        ],
         filters={"enabled": 1},
         order_by="is_default desc, modified desc",
         limit_page_length=200,
@@ -71,7 +89,11 @@ def get_layout_preset(name: str):
         "title": doc.title,
         "enabled": cint(doc.enabled or 0),
         "is_default": cint(doc.is_default or 0),
+        "apply_scope": (doc.apply_scope or "UI Panel"),
         "layout": _preset_payload(doc),
+        "component_css_vars_json": _json_or_default(getattr(doc, "component_css_vars_json", ""), {}),
+        "component_classes": (getattr(doc, "component_classes", "") or "").strip(),
+        "last_resolved_on": str(getattr(doc, "last_resolved_on", "") or ""),
     }
 
 
@@ -119,6 +141,39 @@ def apply_layout_preset(preset_name: str, theme_name: str | None = None):
         "preset": preset.name,
         "theme": target_theme,
         "layout_name": layout.get("name"),
+    }
+
+
+@frappe.whitelist(allow_guest=False)
+def resolve_layout_preset_runtime(preset_name: str, save_cache: int = 0):
+    _ensure_system_user()
+    if not preset_name:
+        frappe.throw(_("preset_name is required"))
+    if not frappe.db.exists("UI Layout Preset", preset_name):
+        frappe.throw(_("UI Layout Preset not found: {0}").format(preset_name))
+
+    doc = frappe.get_doc("UI Layout Preset", preset_name)
+    runtime = resolve_layout_preset_runtime_doc(doc, target_scope="UI Panel")
+
+    save_cache = cint(save_cache or 0)
+    if save_cache:
+        _ensure_manager()
+        doc.component_css_vars_json = frappe.as_json(runtime.get("css_vars") or {})
+        doc.component_classes = " ".join(runtime.get("classes") or [])
+        doc.last_resolved_on = frappe.utils.now_datetime()
+        doc.save(ignore_permissions=True)
+        frappe.db.commit()
+
+    return {
+        "preset_name": doc.name,
+        "apply_scope": runtime.get("apply_scope"),
+        "active_for_scope": runtime.get("active_for_scope"),
+        "css_vars": runtime.get("css_vars") or {},
+        "classes": runtime.get("classes") or [],
+        "warnings": runtime.get("warnings") or [],
+        "matched": runtime.get("matched") or [],
+        "unmatched": runtime.get("unmatched") or [],
+        "saved_cache": 1 if save_cache else 0,
     }
 
 

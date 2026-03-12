@@ -472,7 +472,13 @@ def seed_defaults():
                     "label": "Galaxy UI",
                     "items": [
                         {"type": "route", "ref": "/app/ui_panel", "label": "Dashboard", "icon": "dashboard"},
-                        {"type": "route", "ref": "#/control-center", "label": "Control Center", "icon": "settings"},
+                        {
+                            "type": "route",
+                            "ref": "control-center",
+                            "route": "#/control-center",
+                            "label": "Control Center",
+                            "icon": "settings",
+                        },
                     ],
                 },
                 {

@@ -57,7 +57,18 @@ def _normalize_var_name(name: str) -> str:
 
 def validate_component_options_v1(raw_component_options) -> tuple[dict, list[str]]:
     warnings = []
-    parsed = _safe_json(raw_component_options, {})
+    parsed = raw_component_options
+    if isinstance(raw_component_options, str):
+        text = raw_component_options.strip()
+        if not text:
+            parsed = {}
+        else:
+            try:
+                parsed = json.loads(text)
+            except Exception:
+                return {}, ["Invalid component_options_json: expected valid JSON object"]
+    else:
+        parsed = _safe_json(raw_component_options, {})
     if not isinstance(parsed, dict):
         return {}, ["component_options_json must be a JSON object"]
 

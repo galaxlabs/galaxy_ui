@@ -89,7 +89,7 @@ docs/
 
 ### Panel Feature Flags
 - `get_panel_bundle` now returns `features` for UI gating:
-  - `appearance`, `builder`, `components`, `dashboard`, `navigation`, `registry`, `bridge`
+  - `appearance`, `builder`, `components`, `dashboard`, `navigation`, `registry`, `bridge`, `react_dashboard`
 - Optional site-level override in `site_config.json`:
 
 ```json
@@ -107,6 +107,7 @@ docs/
 - `galaxy_ui.api.bridge.get_ui_app_config`
 - `galaxy_ui.api.bridge.get_ui_nav`
 - `galaxy_ui.api.bridge.get_ui_bundle`
+- `galaxy_ui.api.bridge.get_react_dashboard_runtime`
 
 ### Registry + Types
 - `galaxy_ui.api.registry.call`
@@ -159,6 +160,8 @@ Detailed onboarding: [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)
 
 - SDK client: [docs/sdk/galaxy-ui-client.ts](docs/sdk/galaxy-ui-client.ts)
 - Integration guide: [docs/INTEGRATION_SDK.md](docs/INTEGRATION_SDK.md)
+- React dashboard switch + runtime config: [docs/REACT_DASHBOARD.md](docs/REACT_DASHBOARD.md)
+- Accounts module phase guide: [docs/ACCOUNTS_MODULE.md](docs/ACCOUNTS_MODULE.md)
 
 ## Example Records Kept for Documentation
 

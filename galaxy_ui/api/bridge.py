@@ -105,6 +105,8 @@ def _resolve_base_urls(app_config: dict) -> dict:
         urls["api_base"] = app_config.get("api_base")
     if app_config.get("assets_base") and not urls.get("assets_base"):
         urls["assets_base"] = app_config.get("assets_base")
+    if not urls.get("frappe_base"):
+        urls["frappe_base"] = frappe.utils.get_url()
     return urls
 
 
@@ -215,5 +217,37 @@ def get_ui_bundle(app_id: str):
             "site": frappe.local.site,
             "user": frappe.session.user,
             "is_system_user": 1,
+        },
+    }
+
+
+@frappe.whitelist(allow_guest=False)
+def get_react_dashboard_runtime(app_id: str | None = None):
+    """Return runtime config for an external React dashboard (e.g. Vercel-hosted)."""
+    _ensure_system_user()
+    clean_app_id = (app_id or "").strip().lower() or None
+    app_doc = _get_app_config_doc(clean_app_id) if clean_app_id else _get_app_config_doc(None)
+    app_config = _sanitize_app_config(app_doc) if app_doc else {}
+    base_urls = _resolve_base_urls(app_config)
+    feature_flags = dict(app_config.get("feature_flags") or {})
+
+    react_url = (
+        (base_urls.get("react_dashboard_url") or "").strip()
+        or (base_urls.get("dashboard_app_url") or "").strip()
+        or (base_urls.get("web_app_url") or "").strip()
+    )
+
+    return {
+        "app_id": (app_config.get("app_id") or clean_app_id or "").strip().lower(),
+        "enabled": cint(app_config.get("enabled") or 0),
+        "react_dashboard_url": react_url,
+        "base_urls": base_urls,
+        "feature_flags": feature_flags,
+        "branding": dict(app_config.get("branding") or {}),
+        "frappe": {
+            "site": frappe.local.site,
+            "base_url": frappe.utils.get_url(),
+            "api_base": f"{frappe.utils.get_url()}/api",
+            "user": frappe.session.user,
         },
     }
